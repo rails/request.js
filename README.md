@@ -1,6 +1,6 @@
-# Request.JS
+# Rails Request.JS
 
-Request.JS encapsulates the logic to send by default some headers that are required by rails applications like the `X-CSRF-Token`.
+Rails Request.JS encapsulates the logic to send by default some headers that are required by rails applications like the `X-CSRF-Token`.
 
 # Install
 
@@ -37,6 +37,6 @@ async myMethod () {
 
 # License
 
-Request.JS is released under the [MIT License](LICENSE).
+Rails Request.JS is released under the [MIT License](LICENSE).
 
 © 2021 Basecamp, LLC.
