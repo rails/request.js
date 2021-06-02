@@ -1,12 +1,22 @@
 {
   "name": "rails-fetch",
-  "version": "0.0.1",
-  "description": "A tiny Fetch API wrapper to allow you make http requests without need to handle to send the CSRF Token on every request",
-  "main": "index.js",
+  "version": "0.0.0",
+  "description": "A tiny Fetch API wrapper that allows you to make http requests without need to handle to send the CSRF Token on every request",
+  "main": "./src/index.js",
+  "module": "./src/index.js",
   "repository": "https://github.com/marcelolx/rails-fetch.git",
   "author": "Marcelo Lauxen <marcelolauxen16@gmail.com>",
   "license": "MIT",
   "private": false,
+  "keywords": [
+    "rails",
+    "fetch",
+    "browser",
+    "fetch api"
+  ],
+  "bugs": {
+    "url": "https://github.com/marcelolx/rails-fetch/issues"
+  },
   "scripts": {
     "lint": "standard src"
   },
