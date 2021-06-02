@@ -1,16 +1,16 @@
-# Rails Fetch
+# Request.JS
 
-Rails Fetch encapsulates the logic to send by default some headers that are required by rails applications like the `X-CSRF-Token`.
+Request.JS encapsulates the logic to send by default some headers that are required by rails applications like the `X-CSRF-Token`.
 
 # Install
 
 ### npm
 ```
-npm i rails-fetch
+npm i @rails/request.js
 ```
 ### yarn
 ```shell
-yarn add rails-fetch
+yarn add @rails/request.js
 ```
 
 # How to use
@@ -20,12 +20,12 @@ Just import the `Request` class from the package and instantiate it passing the 
 Example:
 
 ```js
-import { Request } from 'rails-fetch'
+import { Request } from '@rails/request.js'
 
 ....
 
 async myMethod () {
-  const request = new Request('post', 'localhost:3000/my_endpoint', { body: { name: 'Rails Fetch' }})
+  const request = new Request('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
   const response = await request.perform()
   if (response.ok) {
     const body = await response.text
@@ -35,10 +35,8 @@ async myMethod () {
 }
 ```
 
-# Credits
-
-[Basecamp](https://github.com/basecamp), since this piece of code has been extracted from hey.com.
-
 # License
 
-Rails Fetch is released under the [MIT License](LICENSE).
+Request.JS is released under the [MIT License](LICENSE).
+
+© 2021 Basecamp, LLC.
