@@ -49,7 +49,7 @@ export class Request {
     } else if (this.body instanceof window.File) {
       return this.body.type
     } else {
-      return 'application/octet-stream'
+      return 'application/json'
     }
   }
 
@@ -57,6 +57,8 @@ export class Request {
     switch (this.responseKind) {
       case 'html':
         return 'text/html, application/xhtml+xml'
+      case 'turbo-stream':
+        return 'text/vnd.turbo-stream.html, text/html, application/xhtml+xml'
       case 'json':
         return 'application/json'
       default:
