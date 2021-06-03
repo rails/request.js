@@ -29,12 +29,15 @@ export class Request {
   }
 
   get headers () {
-    return compact({
-      'X-Requested-With': 'XMLHttpRequest',
-      'X-CSRF-Token': this.csrfToken,
-      'Content-Type': this.contentType,
-      Accept: this.accept
-    })
+    return compact(
+      Object.assign({
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRF-Token': this.csrfToken,
+        'Content-Type': this.contentType,
+        Accept: this.accept
+      },
+      this.additionalHeaders)
+    )
   }
 
   get csrfToken () {
@@ -76,6 +79,10 @@ export class Request {
 
   get signal () {
     return this.options.signal
+  }
+
+  get additionalHeaders () {
+    return this.options.headers || {}
   }
 }
 
