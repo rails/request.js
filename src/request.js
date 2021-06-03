@@ -19,7 +19,7 @@ export class Request {
 
   get fetchOptions () {
     return {
-      method: this.method,
+      method: this.method.toUpperCase(),
       headers: this.headers,
       body: this.body,
       signal: this.signal,
