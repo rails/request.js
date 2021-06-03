@@ -35,6 +35,15 @@ async myMethod () {
 }
 ```
 
+#### Turbo Streams
+
+Request.JS will automatically process Turbo Stream responses. Ensure that your Javascript sets the `window.Turbo` global variable:
+
+```javascript
+import { Turbo } from "@hotwired/turbo-rails"
+window.Turbo = Turbo
+```
+
 # License
 
 Rails Request.JS is released under the [MIT License](LICENSE).
