@@ -1,4 +1,4 @@
-export class Response {
+export class FetchResponse {
   constructor (response) {
     this.response = response
   }

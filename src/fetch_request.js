@@ -1,7 +1,7 @@
-import { Response } from './response'
+import { FetchResponse } from './fetch_response'
 import { getCookie } from './lib/cookie'
 
-export class Request {
+export class FetchRequest {
   constructor (method, url, options = {}) {
     this.method = method
     this.url = url
@@ -9,7 +9,7 @@ export class Request {
   }
 
   async perform () {
-    const response = new Response(await window.fetch(this.url, this.fetchOptions))
+    const response = new FetchResponse(await window.fetch(this.url, this.fetchOptions))
     if (response.unauthenticated && response.authenticationURL) {
       return Promise.reject(window.location.href = response.authenticationURL)
     } else {
