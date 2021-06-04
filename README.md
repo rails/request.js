@@ -15,7 +15,7 @@ yarn add @rails/request.js
 
 # How to use
 
-Just import the `Request` class from the package and instantiate it passing the request `method`, `url`, `options`,  then call `await request.perform()` and do what do you need with the response.
+Just import the `FetchRequest` class from the package and instantiate it passing the request `method`, `url`, `options`,  then call `await request.perform()` and do what do you need with the response.
 
 Example:
 
@@ -25,7 +25,7 @@ import { Request } from '@rails/request.js'
 ....
 
 async myMethod () {
-  const request = new Request('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
   const response = await request.perform()
   if (response.ok) {
     const body = await response.text

@@ -1,4 +1,4 @@
-import { Request } from './request'
-import { Response } from './response'
+import { FetchRequest } from './fetch_request'
+import { FetchResponse } from './fetch_response'
 
-export { Request, Response }
+export { FetchRequest, FetchResponse }
