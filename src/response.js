@@ -47,4 +47,20 @@ export class Response {
   get text () {
     return this.response.text()
   }
+
+  get isTurboStream () {
+    return this.contentType.match(/^text\/vnd\.turbo-stream\.html/)
+  }
+
+  async renderTurboStream () {
+    if (this.isTurboStream) {
+      if (window.Turbo) {
+        Turbo.renderStreamMessage(await this.text)
+      } else {
+        console.warn('You must set `window.Turbo = Turbo` to automatically process Turbo Stream events with request.js')
+      }
+    } else {
+      return Promise.reject(new Error(`Expected a Turbo Stream response but got "${this.contentType}" instead`))
+    }
+  }
 }

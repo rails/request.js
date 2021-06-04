@@ -13,6 +13,7 @@ export class Request {
     if (response.unauthenticated && response.authenticationURL) {
       return Promise.reject(window.location.href = response.authenticationURL)
     } else {
+      if (response.ok && response.isTurboStream) { response.renderTurboStream() }
       return response
     }
   }
