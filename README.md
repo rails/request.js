@@ -20,7 +20,7 @@ Just import the `FetchRequest` class from the package and instantiate it passing
 Example:
 
 ```js
-import { Request } from '@rails/request.js'
+import { FetchRequest } from '@rails/request.js'
 
 ....
 
