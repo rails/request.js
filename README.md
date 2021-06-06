@@ -44,6 +44,17 @@ import { Turbo } from "@hotwired/turbo-rails"
 window.Turbo = Turbo
 ```
 
+# Known Issues
+
+`FetchRequest` sets a `"X-Requested-With": "XmlHttpRequest"` header. If you have not upgraded to Turbo and still use `Turbolinks` in your Gemfile, this means
+you will not be able to check if the request was redirected. 
+
+```js
+  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const response = await request.perform()
+  response.redirected // => will always be false.
+```
+
 # License
 
 Rails Request.JS is released under the [MIT License](LICENSE).
