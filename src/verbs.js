@@ -1,4 +1,4 @@
-import { FetchRequest } from './fetchRequest'
+import { FetchRequest } from './fetch_request'
 
 async function get (url, options) {
   const response = new FetchRequest('get', url, options)
