@@ -1,4 +1,5 @@
 import { FetchResponse } from './fetch_response'
+import { RequestInterceptor } from './request_interceptor'
 import { getCookie } from './lib/cookie'
 
 export class FetchRequest {
@@ -9,6 +10,14 @@ export class FetchRequest {
   }
 
   async perform () {
+    try {
+      const requestInterceptor = RequestInterceptor.get()
+      if (requestInterceptor) {
+        await requestInterceptor(this)
+      }
+    } catch (error) {
+      console.error(error)
+    }
     const response = new FetchResponse(await window.fetch(this.url, this.fetchOptions))
     if (response.unauthenticated && response.authenticationURL) {
       return Promise.reject(window.location.href = response.authenticationURL)
@@ -16,6 +25,12 @@ export class FetchRequest {
       if (response.ok && response.isTurboStream) { response.renderTurboStream() }
       return response
     }
+  }
+
+  addHeader (key, value) {
+    const headers = this.additionalHeaders
+    headers[key] = value
+    this.options.headers = headers
   }
 
   get fetchOptions () {

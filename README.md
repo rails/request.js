@@ -20,7 +20,7 @@ Just import the `FetchRequest` class from the package and instantiate it passing
 Example:
 
 ```js
-import { Request } from '@rails/request.js'
+import { FetchRequest } from '@rails/request.js'
 
 ....
 
@@ -42,6 +42,35 @@ Request.JS will automatically process Turbo Stream responses. Ensure that your J
 ```javascript
 import { Turbo } from "@hotwired/turbo-rails"
 window.Turbo = Turbo
+```
+
+#### Request Interceptor
+
+To authenticate fetch requests (eg. with Bearer token) you can use request interceptor. It allows pausing request invocation for fetching token and then adding it to headers:
+
+```javascript
+import { RequestInterceptor } from '@rails/request.js'
+// ...
+
+// Set interceptor
+RequestInterceptor.register(async (request) => {
+  const token = await getSessionToken(window.app)
+  request.addHeader('Authorization', `Bearer ${token}`)
+})
+
+// Reset interceptor
+RequestInterceptor.reset()
+```
+
+# Known Issues
+
+`FetchRequest` sets a `"X-Requested-With": "XmlHttpRequest"` header. If you have not upgraded to Turbo and still use `Turbolinks` in your Gemfile, this means
+you will not be able to check if the request was redirected.
+
+```js
+  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const response = await request.perform()
+  response.redirected // => will always be false.
 ```
 
 # License
