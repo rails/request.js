@@ -1,5 +1,6 @@
-import { Request } from './request'
-import { Response } from './response'
-import {get, post, put, patch, destroy} from './verbs'
+import { FetchRequest } from './fetch_request'
+import { FetchResponse } from './fetch_response'
+import { RequestInterceptor } from './request_interceptor'
+import { get, post, put, patch, destroy } from './verbs'
 
-export { Request, Response, get, post, put, patch, destroy}
+export { FetchRequest, FetchResponse, RequestInterceptor, get, post, put, patch, destroy }
