@@ -35,6 +35,26 @@ async myMethod () {
 }
 ```
 
+#### Shorthand methods
+
+Alternatively, you can use a shorthand version for the main HTTP verbs, `get`, `post`, `put`, `patch` or `destroy`.
+
+Example:
+
+```js
+import { get, post, put, patch, destroy } from '@rails/request.js'
+
+...
+
+async myMethod () {
+  const response = await post('localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  if (response.ok) {
+    ...
+  }
+}
+```
+
+
 #### Turbo Streams
 
 Request.JS will automatically process Turbo Stream responses. Ensure that your Javascript sets the `window.Turbo` global variable:
