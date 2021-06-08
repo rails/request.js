@@ -5,6 +5,9 @@ export function getCookie (name) {
 
   if (cookie) {
     const value = cookie.split('=').slice(1).join('=')
-    return value ? decodeURIComponent(value) : undefined
+
+    if (value) {
+      return decodeURIComponent(value)
+    }
   }
 }

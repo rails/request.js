@@ -19,12 +19,13 @@ export class FetchRequest {
       console.error(error)
     }
     const response = new FetchResponse(await window.fetch(this.url, this.fetchOptions))
+
     if (response.unauthenticated && response.authenticationURL) {
       return Promise.reject(window.location.href = response.authenticationURL)
-    } else {
-      if (response.ok && response.isTurboStream) { response.renderTurboStream() }
-      return response
     }
+
+    if (response.ok && response.isTurboStream) { response.renderTurboStream() }
+    return response
   }
 
   addHeader (key, value) {
@@ -67,9 +68,9 @@ export class FetchRequest {
       return undefined
     } else if (this.body instanceof window.File) {
       return this.body.type
-    } else {
-      return 'application/json'
     }
+
+    return 'application/json'
   }
 
   get accept () {
@@ -104,12 +105,14 @@ export class FetchRequest {
 
 function compact (object) {
   const result = {}
+
   for (const key in object) {
     const value = object[key]
     if (value !== undefined) {
       result[key] = value
     }
   }
+
   return result
 }
 
