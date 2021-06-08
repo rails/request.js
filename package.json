@@ -1,6 +1,6 @@
 {
   "name": "@rails/request.js",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A tiny Fetch API wrapper that allows you to make http requests without need to handle to send the CSRF Token on every request",
   "main": "./src/index.js",
   "module": "./src/index.js",
