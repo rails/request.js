@@ -60,8 +60,8 @@ export class FetchResponse {
       } else {
         console.warn('You must set `window.Turbo = Turbo` to automatically process Turbo Stream events with request.js')
       }
+    } else {
+      return Promise.reject(new Error(`Expected a Turbo Stream response but got "${this.contentType}" instead`))
     }
-
-    return Promise.reject(new Error(`Expected a Turbo Stream response but got "${this.contentType}" instead`))
   }
 }
