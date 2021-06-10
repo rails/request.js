@@ -31,7 +31,7 @@ export class FetchResponse {
 
   get html () {
     if (this.contentType.match(/^(application|text)\/(html|xhtml\+xml)$/)) {
-      return this.response.text()
+      return this.text
     }
 
     return Promise.reject(new Error(`Expected an HTML response but got "${this.contentType}" instead`))
@@ -39,14 +39,14 @@ export class FetchResponse {
 
   get json () {
     if (this.contentType.match(/^application\/json/)) {
-      return this.response.json()
+      return this.responseJson || (this.responseJson = this.response.json())
     }
 
     return Promise.reject(new Error(`Expected a JSON response but got "${this.contentType}" instead`))
   }
 
   get text () {
-    return this.response.text()
+    return this.responseText || (this.responseText = this.response.text())
   }
 
   get isTurboStream () {
