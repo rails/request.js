@@ -11,3 +11,21 @@ export function getCookie (name) {
     }
   }
 }
+
+export function compact (object) {
+  const result = {}
+
+  for (const key in object) {
+    const value = object[key]
+    if (value !== undefined) {
+      result[key] = value
+    }
+  }
+
+  return result
+}
+
+export function metaContent (name) {
+  const element = document.head.querySelector(`meta[name="${name}"]`)
+  return element && element.content
+}
