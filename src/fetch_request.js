@@ -1,6 +1,6 @@
 import { FetchResponse } from './fetch_response'
 import { RequestInterceptor } from './request_interceptor'
-import { getCookie } from './lib/cookie'
+import { getCookie, compact, metaContent } from './lib/utils'
 
 export class FetchRequest {
   constructor (method, url, options = {}) {
@@ -101,22 +101,4 @@ export class FetchRequest {
   get additionalHeaders () {
     return this.options.headers || {}
   }
-}
-
-function compact (object) {
-  const result = {}
-
-  for (const key in object) {
-    const value = object[key]
-    if (value !== undefined) {
-      result[key] = value
-    }
-  }
-
-  return result
-}
-
-function metaContent (name) {
-  const element = document.head.querySelector(`meta[name="${name}"]`)
-  return element && element.content
 }
