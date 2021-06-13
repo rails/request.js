@@ -7,6 +7,10 @@ export class FetchResponse {
     return this.response.status
   }
 
+  get redirected () {
+    return this.response.redirected
+  }
+
   get ok () {
     return this.response.ok
   }
