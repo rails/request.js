@@ -25,7 +25,7 @@ import { FetchRequest } from '@rails/request.js'
 ....
 
 async myMethod () {
-  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: JSON.stringify({ name: 'Request.JS' }) })
   const response = await request.perform()
   if (response.ok) {
     const body = await response.text
@@ -47,7 +47,7 @@ import { get, post, put, patch, destroy } from '@rails/request.js'
 ...
 
 async myMethod () {
-  const response = await post('localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const response = await post('localhost:3000/my_endpoint', { body: JSON.stringify({ name: 'Request.JS' }) })
   if (response.ok) {
     ...
   }
@@ -88,7 +88,7 @@ RequestInterceptor.reset()
 you will not be able to check if the request was redirected.
 
 ```js
-  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: JSON.stringify({ name: 'Request.JS' }) })
   const response = await request.perform()
   response.redirected // => will always be false.
 ```
