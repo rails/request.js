@@ -54,6 +54,23 @@ async myMethod () {
 }
 ```
 
+#### Request body
+
+Instead of stringify the body of a request which the content type is `application/json`, you can just pass the javascript object as the body of the request and Request.JS will stringify it for you.
+
+```js
+import { post } from '@rails/request.js'
+
+...
+
+async myMethod () {
+  const response = await post('localhost:3000/my_endpoint', { body: { name: 'Request.JS' } })
+  if (response.ok) {
+    ...
+  }
+}
+```
+
 
 #### Turbo Streams
 
