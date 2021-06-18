@@ -24,7 +24,10 @@ export class FetchRequest {
       return Promise.reject(window.location.href = response.authenticationURL)
     }
 
-    if (response.ok && response.isTurboStream) { response.renderTurboStream() }
+    if (response.ok && response.isTurboStream) {
+      response.renderTurboStream()
+    }
+
     return response
   }
 
@@ -38,7 +41,7 @@ export class FetchRequest {
     return {
       method: this.method.toUpperCase(),
       headers: this.headers,
-      body: this.body,
+      body: this.formattedBody,
       signal: this.signal,
       credentials: 'same-origin',
       redirect: 'follow'
@@ -100,5 +103,16 @@ export class FetchRequest {
 
   get additionalHeaders () {
     return this.options.headers || {}
+  }
+
+  get formattedBody () {
+    const bodyIsAString = Object.prototype.toString.call(this.body) === '[object String]'
+    const contentTypeIsJson = this.headers['Content-Type'] === 'application/json'
+
+    if (contentTypeIsJson && !bodyIsAString) {
+      return JSON.stringify(this.body)
+    }
+
+    return this.body
   }
 }
