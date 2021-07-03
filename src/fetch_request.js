@@ -44,7 +44,7 @@ export class FetchRequest {
       body: this.formattedBody,
       signal: this.signal,
       credentials: 'same-origin',
-      redirect: 'follow'
+      redirect: this.redirect
     }
   }
 
@@ -99,6 +99,10 @@ export class FetchRequest {
 
   get signal () {
     return this.options.signal
+  }
+
+  get redirect () {
+    return this.options.redirect || 'follow'
   }
 
   get additionalHeaders () {
