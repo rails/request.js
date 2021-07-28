@@ -71,6 +71,15 @@ async myMethod () {
 }
 ```
 
+### responseKind
+
+You can provide this option to specify which kind of response will be accepted. Default is `html`.
+
+Options are `html`, `turbo-stream`, `json`.
+
+### contentType
+
+When provided this value will be sent in the `Content-Type` header. When not provided Request.JS will send nothing when the `body` of the request is `null` or an instance of `FormData`, when the `body` is an instance of a `File` then the type of the file will be sent and `application/json` will be sent if none of the prior conditions matches.
 
 #### Turbo Streams
 
@@ -80,6 +89,8 @@ Request.JS will automatically process Turbo Stream responses. Ensure that your J
 import { Turbo } from "@hotwired/turbo-rails"
 window.Turbo = Turbo
 ```
+
+Since [v7.0.0-beta.6](https://github.com/hotwired/turbo/releases/tag/v7.0.0-beta.6) Turbo sets `window.Turbo` automatically.
 
 #### Request Interceptor
 
@@ -98,6 +109,40 @@ RequestInterceptor.register(async (request) => {
 // Reset interceptor
 RequestInterceptor.reset()
 ```
+
+## Response
+
+### statusCode
+
+Returns the response status.
+
+### ok
+
+Returns true if the response was successful.
+
+### unauthenticated
+
+Returns true if the response has a `401` status code.
+
+### authenticationURL
+
+Returns the value contained in the `WWW-Authenticate` header.
+
+### contentType
+
+Returns the response content-type.
+
+### html
+
+Returns the html body, if the content type of the response isn't `html` then will be returned a rejected promise.
+
+### json
+
+Returns the json body, if the content type of the response isn't `json` then will be returned a rejected promise.
+
+### headers
+
+Returns the response headers.
 
 # Known Issues
 
