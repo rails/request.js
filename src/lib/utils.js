@@ -29,3 +29,22 @@ export function metaContent (name) {
   const element = document.head.querySelector(`meta[name="${name}"]`)
   return element && element.content
 }
+
+export function stringEntriesFromFormData (formData) {
+  return [...formData].reduce((entries, [name, value]) => {
+    return entries.concat(typeof value === 'string' ? [[name, value]] : [])
+  }, [])
+}
+
+export function mergeEntries (searchParams, entries) {
+  for (const [name, value] of entries) {
+    if (value instanceof window.File) continue
+
+    if (searchParams.has(name)) {
+      searchParams.delete(name)
+      searchParams.set(name, value)
+    } else {
+      searchParams.append(name, value)
+    }
+  }
+}

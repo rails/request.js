@@ -1,6 +1,6 @@
 import { FetchResponse } from './fetch_response'
 import { RequestInterceptor } from './request_interceptor'
-import { getCookie, compact, metaContent } from './lib/utils'
+import { getCookie, compact, metaContent, stringEntriesFromFormData, mergeEntries } from './lib/utils'
 
 export class FetchRequest {
   constructor (method, url, options = {}) {
@@ -18,6 +18,7 @@ export class FetchRequest {
     } catch (error) {
       console.error(error)
     }
+
     const response = new FetchResponse(await window.fetch(this.url, this.fetchOptions))
 
     if (response.unauthenticated && response.authenticationURL) {
@@ -97,11 +98,16 @@ export class FetchRequest {
     const originalQuery = (this.originalUrl.split('?')[1] || '').split('#')[0]
     const params = new URLSearchParams(originalQuery)
 
-    if (this.options.query) {
-      for (const [key, value] of Object.entries(this.options.query)) {
-        params.append(key, value)
-      }
+    let requestQuery = this.options.query
+    if (requestQuery instanceof window.FormData) {
+      requestQuery = stringEntriesFromFormData(requestQuery)
+    } else if (requestQuery instanceof window.URLSearchParams) {
+      requestQuery = requestQuery.entries()
+    } else {
+      requestQuery = Object.entries(requestQuery || {})
     }
+
+    mergeEntries(params, requestQuery)
 
     const query = params.toString()
     return (query.length > 0 ? `?${query}` : '')
