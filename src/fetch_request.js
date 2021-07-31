@@ -5,8 +5,8 @@ import { getCookie, compact, metaContent } from './lib/utils'
 export class FetchRequest {
   constructor (method, url, options = {}) {
     this.method = method
-    this.url = url
     this.options = options
+    this.url = url + this.query
   }
 
   async perform () {
@@ -88,6 +88,14 @@ export class FetchRequest {
 
   get body () {
     return this.options.body
+  }
+
+  get query () {
+    if (this.options.query) {
+      return `?${new URLSearchParams(this.options.query)}`
+    } else {
+      return ""
+    }
   }
 
   get responseKind () {
