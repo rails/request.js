@@ -84,7 +84,7 @@ Adds additional headers to the request.  `X-CSRF-Token` and `Content-Type` are a
 
 ##### query
 
-Appends query parameters to the URL.
+Appends query parameters to the URL. Query params in the URL are preserved and merged with the query options.
 
 ##### responseKind
 

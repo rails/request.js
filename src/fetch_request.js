@@ -6,7 +6,7 @@ export class FetchRequest {
   constructor (method, url, options = {}) {
     this.method = method
     this.options = options
-    this.url = url + this.query
+    this.originalUrl = url
   }
 
   async perform () {
@@ -94,11 +94,21 @@ export class FetchRequest {
   }
 
   get query () {
+    const originalQuery = (this.originalUrl.split('?')[1] || '').split('#')[0]
+    const params = new URLSearchParams(originalQuery)
+
     if (this.options.query) {
-      return `?${new URLSearchParams(this.options.query)}`
-    } else {
-      return ''
+      for (const [key, value] of Object.entries(this.options.query)) {
+        params.append(key, value)
+      }
     }
+
+    const query = params.toString()
+    return (query.length > 0 ? `?${query}` : '')
+  }
+
+  get url () {
+    return this.originalUrl.split('?')[0] + this.query
   }
 
   get responseKind () {
