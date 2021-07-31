@@ -93,6 +93,14 @@ export class FetchRequest {
     return this.options.body
   }
 
+  get query () {
+    if (this.options.query) {
+      return `?${new URLSearchParams(this.options.query)}`
+    } else {
+      return ''
+    }
+  }
+
   get responseKind () {
     return this.options.responseKind || 'html'
   }
