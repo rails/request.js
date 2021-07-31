@@ -94,7 +94,7 @@ export class FetchRequest {
     if (this.options.query) {
       return `?${new URLSearchParams(this.options.query)}`
     } else {
-      return ""
+      return ''
     }
   }
 
