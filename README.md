@@ -25,7 +25,7 @@ import { FetchRequest } from '@rails/request.js'
 ....
 
 async myMethod () {
-  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: JSON.stringify({ name: 'Request.JS' }) })
   const response = await request.perform()
   if (response.ok) {
     const body = await response.text
@@ -47,7 +47,7 @@ import { get, post, put, patch, destroy } from '@rails/request.js'
 ...
 
 async myMethod () {
-  const response = await post('localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const response = await post('localhost:3000/my_endpoint', { body: JSON.stringify({ name: 'Request.JS' }) })
   if (response.ok) {
     ...
   }
@@ -88,7 +88,7 @@ Appends query parameters to the URL.
 
 ##### responseKind
 
-You can provide this option to specify which kind of response will be accepted. Default is `html`.
+Specifies which response format will be accepted. Default is `html`.
 
 Options are `html`, `turbo-stream`, `json`.
 
@@ -100,6 +100,8 @@ Request.JS will automatically process Turbo Stream responses. Ensure that your J
 import { Turbo } from "@hotwired/turbo-rails"
 window.Turbo = Turbo
 ```
+
+Since [v7.0.0-beta.6](https://github.com/hotwired/turbo/releases/tag/v7.0.0-beta.6) Turbo sets `window.Turbo` automatically.
 
 #### Request Interceptor
 
@@ -119,13 +121,47 @@ RequestInterceptor.register(async (request) => {
 RequestInterceptor.reset()
 ```
 
+## Response
+
+### statusCode
+
+Returns the response status.
+
+### ok
+
+Returns true if the response was successful.
+
+### unauthenticated
+
+Returns true if the response has a `401` status code.
+
+### authenticationURL
+
+Returns the value contained in the `WWW-Authenticate` header.
+
+### contentType
+
+Returns the response content-type.
+
+### html
+
+Returns the html body, if the content type of the response isn't `html` then will be returned a rejected promise.
+
+### json
+
+Returns the json body, if the content type of the response isn't `json` then will be returned a rejected promise.
+
+### headers
+
+Returns the response headers.
+
 # Known Issues
 
 `FetchRequest` sets a `"X-Requested-With": "XmlHttpRequest"` header. If you have not upgraded to Turbo and still use `Turbolinks` in your Gemfile, this means
 you will not be able to check if the request was redirected.
 
 ```js
-  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: { name: 'Request.JS' }})
+  const request = new FetchRequest('post', 'localhost:3000/my_endpoint', { body: JSON.stringify({ name: 'Request.JS' }) })
   const response = await request.perform()
   response.redirected // => will always be false.
 ```
