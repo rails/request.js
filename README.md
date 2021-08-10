@@ -86,6 +86,8 @@ Adds additional headers to the request.  `X-CSRF-Token` and `Content-Type` are a
 
 Appends query parameters to the URL. Query params in the URL are preserved and merged with the query options.
 
+Accepts `Object`, `FormData` or `URLSearchParams`.
+
 ##### responseKind
 
 Specifies which response format will be accepted. Default is `html`.
