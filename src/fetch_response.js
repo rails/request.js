@@ -18,6 +18,10 @@ export class FetchResponse {
   get unauthenticated () {
     return this.statusCode === 401
   }
+  
+  get unprocessableEntity () {
+    return this.statusCode === 422
+  }
 
   get authenticationURL () {
     return this.response.headers.get('WWW-Authenticate')
