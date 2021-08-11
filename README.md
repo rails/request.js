@@ -4,7 +4,7 @@ Rails Request.JS encapsulates the logic to send by default some headers that are
 
 # Install
 
-## Rails Asset Pipeline
+## Asset Pipeline
 
 Install the [requestjs-rails](https://github.com/rails/requestjs-rails) gem and follow the step described there.
 
