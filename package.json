@@ -2,7 +2,7 @@
   "name": "@rails/request.js",
   "version": "0.0.5",
   "description": "A tiny Fetch API wrapper that allows you to make http requests without need to handle to send the CSRF Token on every request",
-  "main": "./src/index.js",
+  "main": "./dist/requestjs.js",
   "module": "./src/index.js",
   "repository": "https://github.com/rails/request.js",
   "author": "Marcelo Lauxen <marcelolauxen16@gmail.com>",
@@ -18,9 +18,13 @@
     "url": "https://github.com/rails/request.js"
   },
   "scripts": {
-    "lint": "standard src"
+    "lint": "standard src",
+    "build": "rollup -c"
   },
   "devDependencies": {
-    "standard": "^16.0.3"
+    "standard": "^16.0.3",
+    "@rollup/plugin-node-resolve": "^11.0.1",
+    "rollup": "^2.35.1",
+    "rollup-plugin-terser": "^7.0.2"
   }
 }
