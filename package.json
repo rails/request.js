@@ -19,12 +19,14 @@
   },
   "scripts": {
     "lint": "standard src",
-    "build": "rollup -c"
+    "build": "rollup -c",
+    "test": "jest"
   },
   "devDependencies": {
     "standard": "^16.0.3",
     "@rollup/plugin-node-resolve": "^11.0.1",
     "rollup": "^2.35.1",
-    "rollup-plugin-terser": "^7.0.2"
+    "rollup-plugin-terser": "^7.0.2",
+    "jest": "^27.0.6"
   }
 }
