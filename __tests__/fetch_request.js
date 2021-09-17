@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import 'isomorphic-fetch'
 import { FetchRequest } from '../src/fetch_request'
 import { FetchResponse } from '../src/fetch_response'
 
@@ -20,24 +21,23 @@ const defaultHeaders = {
   'Accept': 'text/html, application/xhtml+xml'
 }
 
-describe.only('perform', () => {
+describe('perform', () => {
   test('request is performed with 200', async () => {
-    const headers = new Headers()
-    window.fetch = jest.fn().mockResolvedValue({ status: 200, body: "success!", headers })
+    const mockResponse = new Response("success!", { status: 200 })
+    window.fetch = jest.fn().mockResolvedValue(mockResponse)
 
     const testRequest = new FetchRequest("get", "localhost")
     const testResponse = await testRequest.perform()
   
     expect(window.fetch).toHaveBeenCalledTimes(1)
     expect(window.fetch).toHaveBeenCalledWith("localhost", testRequest.fetchOptions)
-    expect(testResponse).toStrictEqual(new FetchResponse({ status: 200, body: "success!", headers }))
+    expect(testResponse).toStrictEqual(new FetchResponse(mockResponse))
   })  
 
   test('request is performed with 401', async () => {
-    const headers = new Headers()
-    headers.append('WWW-Authenticate', 'https://localhost/login')
+    const mockResponse = new Response(undefined, { status: 401, headers: {'WWW-Authenticate': 'https://localhost/login'}})
+    window.fetch = jest.fn().mockResolvedValue(mockResponse)
 
-    window.fetch = jest.fn().mockResolvedValue({ status: 401, headers })
     delete window.location
     window.location = new URL('https://www.example.com')
 
@@ -49,24 +49,21 @@ describe.only('perform', () => {
     })
   })
 
-  test('turbo streams', async () => {
-    const headers = new Headers()
-    headers.append('Content-Type', 'text/vnd.turbo-stream.html')
-    window.fetch = jest.fn().mockResolvedValue({ ok: true, status: 200, headers, text: () => { return Promise.resolve() } })
+  test('turbo stream request checks global Turbo and calls renderTurboStream', async () => {
+    const mockResponse = new Response('', { status: 200, headers: { 'Content-Type': 'text/vnd.turbo-stream.html' }})
+    window.fetch = jest.fn().mockResolvedValue(mockResponse)
 
+    // check console.warn is triggered without window.Turbo
     const warningSpy = jest.spyOn(console, 'warn').mockImplementation()
     const testRequest = new FetchRequest("get", "localhost")
     await testRequest.perform()
     expect(warningSpy).toBeCalled()
-    window.Turbo = {
-      renderStreamMessage: jest.fn().mockResolvedValue()
-    }
+    window.Turbo = { renderStreamMessage: jest.fn() }
 
+    // check FetchResponse renderTurboStream is called
     const renderSpy = jest.spyOn(FetchResponse.prototype, "renderTurboStream")
     await testRequest.perform()
-
     expect(renderSpy).toHaveBeenCalledTimes(1)
-    expect(window.Turbo.renderStreamMessage).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -101,6 +98,10 @@ describe('fetchOptions', () => {
     const turboRequest = new FetchRequest("get", "localhost", { responseKind: 'turbo-stream' })
     expect(turboRequest.fetchOptions.headers)
       .toStrictEqual({...defaultHeaders, 'Accept' : 'text/vnd.turbo-stream.html, text/html, application/xhtml+xml'})
+
+    const invalidResponseKindRequest = new FetchRequest("get", "localhost", { responseKind: 'exotic' })
+    expect(invalidResponseKindRequest.fetchOptions.headers)
+      .toStrictEqual({...defaultHeaders, 'Accept' : '*/*'})
   })  
 
   test('have base headers with content-type', () => {

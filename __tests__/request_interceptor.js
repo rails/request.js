@@ -38,7 +38,6 @@ test('request interceptors overwrite each other', async () => {
   expect(mockInterceptorTwo).toHaveBeenCalledTimes(1)
 })
 
-
 test('request executes even when interceptor rejects', async () => {
   console.error = jest.fn()
   const mockInterceptor = jest.fn().mockRejectedValue()
@@ -50,5 +49,19 @@ test('request executes even when interceptor rejects', async () => {
   expect(RequestInterceptor.get()).toBeDefined()
   expect(mockInterceptor).toHaveBeenCalledTimes(1)
   expect(console.error).toHaveBeenCalledTimes(1)
+  expect(window.fetch).toHaveBeenCalledTimes(1)
+})
+
+test('resetting unregisters interceptor', async () => {
+  const mockInterceptor = jest.fn().mockResolvedValue()
+  RequestInterceptor.register(mockInterceptor)
+  expect(RequestInterceptor.get()).toBeDefined()
+  RequestInterceptor.reset()
+  expect(RequestInterceptor.get()).toBeUndefined()
+
+  const testRequest = new FetchRequest("get", "localhost")
+  await testRequest.perform()
+
+  expect(mockInterceptor).toHaveBeenCalledTimes(0)
   expect(window.fetch).toHaveBeenCalledTimes(1)
 })
