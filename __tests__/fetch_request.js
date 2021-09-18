@@ -15,17 +15,6 @@ jest.mock('../src/lib/utils', () => {
   }
 })
 
-// delete window.location
-// window.location = new URL('https://www.example.com/')
-// expect(window.location.href).toBe('https://www.example.com/')
-
-// const testRequest = new FetchRequest("get", "https://localhost")
-// expect(testRequest.perform()).rejects.toBe('https://localhost/login')
-
-// testRequest.perform().catch(() => {
-//   expect(window.location.href).toBe('https://localhost/login')
-// })
-
 describe('perform', () => {
   test('request is performed with 200', async () => {
     const mockResponse = new Response("success!", { status: 200 })
@@ -45,8 +34,9 @@ describe('perform', () => {
 
     delete window.location
     window.location = new URL('https://www.example.com')
+    expect(window.location.href).toBe('https://www.example.com/')
 
-    const testRequest = new FetchRequest("get", "localhost")
+    const testRequest = new FetchRequest("get", "https://localhost")
     expect(testRequest.perform()).rejects.toBe('https://localhost/login')
 
     testRequest.perform().catch(() => {
@@ -54,20 +44,16 @@ describe('perform', () => {
     })
   })
 
-  test('turbo stream request checks global Turbo and calls renderTurboStream', async () => {
+  test('turbo stream request automatically calls renderTurboStream', async () => {
     const mockResponse = new Response('', { status: 200, headers: { 'Content-Type': 'text/vnd.turbo-stream.html' }})
     window.fetch = jest.fn().mockResolvedValue(mockResponse)
+    jest.spyOn(FetchResponse.prototype, "ok", "get").mockReturnValue(true)
+    jest.spyOn(FetchResponse.prototype, "isTurboStream", "get").mockReturnValue(true)
+    const renderSpy = jest.spyOn(FetchResponse.prototype, "renderTurboStream").mockImplementation()
 
-    // check console.warn is triggered without window.Turbo
-    const warningSpy = jest.spyOn(console, 'warn').mockImplementation()
     const testRequest = new FetchRequest("get", "localhost")
     await testRequest.perform()
-    expect(warningSpy).toBeCalled()
-    window.Turbo = { renderStreamMessage: jest.fn() }
 
-    // check FetchResponse renderTurboStream is called
-    const renderSpy = jest.spyOn(FetchResponse.prototype, "renderTurboStream")
-    await testRequest.perform()
     expect(renderSpy).toHaveBeenCalledTimes(1)
   })
 })

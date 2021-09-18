@@ -3,7 +3,6 @@
  */
 import { RequestInterceptor } from '../src/request_interceptor'
 import { FetchRequest } from '../src/fetch_request'
-import { FetchResponse } from '../src/fetch_response'
 
 beforeEach(() => {
   window.fetch = jest.fn().mockResolvedValue({ status: 200, body: "done" })

@@ -2,7 +2,6 @@
  * @jest-environment jsdom
  */
 import 'isomorphic-fetch'
-import { FetchRequest } from '../src/fetch_request'
 import { FetchResponse } from '../src/fetch_response'
 
 test('default contentType', async () => {
