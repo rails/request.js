@@ -15,11 +15,16 @@ jest.mock('../src/lib/utils', () => {
   }
 })
 
-const defaultHeaders = {
-  'X-Requested-With': 'XMLHttpRequest',
-  'X-CSRF-Token': 'mock-csrf-token',
-  'Accept': 'text/html, application/xhtml+xml'
-}
+// delete window.location
+// window.location = new URL('https://www.example.com/')
+// expect(window.location.href).toBe('https://www.example.com/')
+
+// const testRequest = new FetchRequest("get", "https://localhost")
+// expect(testRequest.perform()).rejects.toBe('https://localhost/login')
+
+// testRequest.perform().catch(() => {
+//   expect(window.location.href).toBe('https://localhost/login')
+// })
 
 describe('perform', () => {
   test('request is performed with 200', async () => {
@@ -67,72 +72,88 @@ describe('perform', () => {
   })
 })
 
-describe('fetchOptions', () => {
-  test('treat method name case-insensitive', async () => {
-    const methodNames = [ "gEt", "GeT", "get", "GET"]
-    for (const methodName of methodNames){
-      const testRequest = new FetchRequest(methodName, "localhost")
-      expect(testRequest.fetchOptions.method).toBe("GET")
-    }
-  })  
+test('treat method name case-insensitive', async () => {
+  const methodNames = [ "gEt", "GeT", "get", "GET"]
+  for (const methodName of methodNames) {
+    const testRequest = new FetchRequest(methodName, "localhost")
+    expect(testRequest.fetchOptions.method).toBe("GET")
+  }
+})
 
-  test('have base headers', async () => {
-    const defaultRequest = new FetchRequest("get", "localhost")
-    expect(defaultRequest.fetchOptions.headers)
-      .toStrictEqual(defaultHeaders)
-  })  
-
-  test('have base headers with accept', async () => {
-    const defaultRequest = new FetchRequest("get", "localhost")
-    expect(defaultRequest.fetchOptions.headers)
-      .toStrictEqual(defaultHeaders)
-
-    const htmlRequest = new FetchRequest("get", "localhost", { responseKind: 'html' })
-    expect(htmlRequest.fetchOptions.headers)
-      .toStrictEqual(defaultHeaders)
-
-    const jsonRequest = new FetchRequest("get", "localhost", { responseKind: 'json' })
-    expect(jsonRequest.fetchOptions.headers)
-      .toStrictEqual({...defaultHeaders, 'Accept' : 'application/json'})
-
-    const turboRequest = new FetchRequest("get", "localhost", { responseKind: 'turbo-stream' })
-    expect(turboRequest.fetchOptions.headers)
-      .toStrictEqual({...defaultHeaders, 'Accept' : 'text/vnd.turbo-stream.html, text/html, application/xhtml+xml'})
-
-    const invalidResponseKindRequest = new FetchRequest("get", "localhost", { responseKind: 'exotic' })
-    expect(invalidResponseKindRequest.fetchOptions.headers)
-      .toStrictEqual({...defaultHeaders, 'Accept' : '*/*'})
-  })  
-
-  test('have base headers with content-type', () => {
-    const customRequest = new FetchRequest("get", "localhost/test.json", { contentType: 'any/thing' })
-    expect(customRequest.fetchOptions.headers)
-      .toStrictEqual({ ...defaultHeaders, "Content-Type": 'any/thing'})
-
-    const formData = new FormData()
-    formData.append("this", "value")
-    const formDataRequest = new FetchRequest("get", "localhost", { body: formData })
-    expect(formDataRequest.fetchOptions.headers)
-      .toStrictEqual(defaultHeaders)
-
-    const file = new File(["foo"], "foo.txt", { type: "text/plain" })
-    const fileRequest = new FetchRequest("get", "localhost", { body: file })
-    expect(fileRequest.fetchOptions.headers)
-      .toStrictEqual({ ...defaultHeaders, "Content-Type": "text/plain"})
-  
-    const jsonRequest = new FetchRequest("get", "localhost", { body: { some: "json"} })
-    expect(jsonRequest.fetchOptions.headers)
-      .toStrictEqual({ ...defaultHeaders, "Content-Type": "application/json"})
+describe('header handling', () => {
+  const defaultHeaders = {
+    'X-Requested-With': 'XMLHttpRequest',
+    'X-CSRF-Token': 'mock-csrf-token',
+    'Accept': 'text/html, application/xhtml+xml'
+  }
+  describe('responseKind', () => {
+    test('none', async () => {
+      const defaultRequest = new FetchRequest("get", "localhost")
+      expect(defaultRequest.fetchOptions.headers)
+        .toStrictEqual(defaultHeaders)
+    })
+    test('html', async () => {
+      const htmlRequest = new FetchRequest("get", "localhost", { responseKind: 'html' })
+      expect(htmlRequest.fetchOptions.headers)
+        .toStrictEqual(defaultHeaders)
+    })
+    test('json', async () => {
+      const jsonRequest = new FetchRequest("get", "localhost", { responseKind: 'json' })
+      expect(jsonRequest.fetchOptions.headers)
+        .toStrictEqual({...defaultHeaders, 'Accept' : 'application/json'})
+    })
+    test('turbo-stream', async () => {
+      const turboRequest = new FetchRequest("get", "localhost", { responseKind: 'turbo-stream' })
+      expect(turboRequest.fetchOptions.headers)
+        .toStrictEqual({...defaultHeaders, 'Accept' : 'text/vnd.turbo-stream.html, text/html, application/xhtml+xml'})
+    })
+    test('invalid', async () => {
+      const invalidResponseKindRequest = new FetchRequest("get", "localhost", { responseKind: 'exotic' })
+      expect(invalidResponseKindRequest.fetchOptions.headers)
+        .toStrictEqual({...defaultHeaders, 'Accept' : '*/*'})
+    })
   })
 
-  test('reflect additional headers', () => {
-    const request = new FetchRequest("get", "localhost", { contentType: "application/json", headers: { custom: "Header", "Content-Type": "this/overwrites" } })
+  describe('contentType', () => {
+    test('is added to headers', () => {
+      const customRequest = new FetchRequest("get", "localhost/test.json", { contentType: 'any/thing' })
+      expect(customRequest.fetchOptions.headers)
+        .toStrictEqual({ ...defaultHeaders, "Content-Type": 'any/thing'})
+    })
+    test('is not set by formData', () => {  
+      const formData = new FormData()
+      formData.append("this", "value")
+      const formDataRequest = new FetchRequest("get", "localhost", { body: formData })
+      expect(formDataRequest.fetchOptions.headers)
+        .toStrictEqual(defaultHeaders)
+    })
+    test('is set by file body', () => {      
+      const file = new File(["contenxt"], "file.txt", { type: "text/plain" })
+      const fileRequest = new FetchRequest("get", "localhost", { body: file })
+      expect(fileRequest.fetchOptions.headers)
+        .toStrictEqual({ ...defaultHeaders, "Content-Type": "text/plain"})    
+    })
+    test('is set by json body', () => {      
+      const jsonRequest = new FetchRequest("get", "localhost", { body: { some: "json"} })
+      expect(jsonRequest.fetchOptions.headers)
+        .toStrictEqual({ ...defaultHeaders, "Content-Type": "application/json"})
+    })
+  })
+
+  test('additional headers are appended', () => {
+    const request = new FetchRequest("get", "localhost", { contentType: "application/json", headers: { custom: "Header" } })
     expect(request.fetchOptions.headers)
-      .toStrictEqual({ ...defaultHeaders, custom: "Header", "Content-Type": "this/overwrites"})
+      .toStrictEqual({ ...defaultHeaders, custom: "Header", "Content-Type": "application/json"})
     request.addHeader("test", "header")
     expect(request.fetchOptions.headers)
-      .toStrictEqual({ ...defaultHeaders, custom: "Header", "Content-Type": "this/overwrites", "test": "header"})
-  })
+      .toStrictEqual({ ...defaultHeaders, custom: "Header", "Content-Type": "application/json", "test": "header"})
+  })    
+
+  test('headers win over contentType', () => {
+    const request = new FetchRequest("get", "localhost", { contentType: "application/json", headers: { "Content-Type": "this/overwrites" } })
+    expect(request.fetchOptions.headers)
+      .toStrictEqual({ ...defaultHeaders, "Content-Type": "this/overwrites"})
+  })    
 
   test('serializes JSON to String', () => {
     const jsonBody = { some: "json" }
@@ -142,8 +163,11 @@ describe('fetchOptions', () => {
 
     request = new FetchRequest("get", "localhost", { body: jsonBody })
     expect(request.fetchOptions.body).toBe(JSON.stringify(jsonBody))
+  })
 
-    request = new FetchRequest("get", "localhost", { body: jsonBody, contentType: "not/json" })
+  test('not serializes JSON with explicit different contentTyp', () => {
+    const jsonBody = { some: "json" }
+    const request = new FetchRequest("get", "localhost", { body: jsonBody, contentType: "not/json" })
     expect(request.fetchOptions.body).toBe(jsonBody)
   })
 
@@ -173,7 +197,7 @@ describe('fetchOptions', () => {
     expect(request.fetchOptions.signal).toBe("signal")
   })
 
-  test('has default credentials setting', () => {
+  test('has fixed credentials setting which cannot be changed', () => {
     let request
     request = new FetchRequest("get", "localhost")
     expect(request.fetchOptions.credentials).toBe('same-origin')
@@ -181,47 +205,44 @@ describe('fetchOptions', () => {
     // has no effect
     request = new FetchRequest("get", "localhost", { credentials: "omit"})
     expect(request.fetchOptions.credentials).toBe('same-origin')
-  })
-
-  
+  })  
 })
 
-describe('url', () => {
-  test('query params from URL and options are merged', () => {
-    const urlAndOptionRequest = new FetchRequest("post", "localhost/test?a=1&b=2#anchor", { query: { c: 3 } })
+describe('query params are parsed', () => {
+  test('anchors are rejected', () => {
+    const testRequest = new FetchRequest("post", "localhost/test?a=1&b=2#anchor", { query: { c: 3 } })
+    expect(testRequest.url).toBe("localhost/test?a=1&b=2&c=3")
+    // const brokenRequest = new FetchRequest("post", "localhost/test#anchor", { query: { a: 1, b: 2, c: 3 } })
+    // expect(brokenRequest.url).toBe("localhost/test?a=1&b=2&c=3")
+  })
+  test('url and options are merged', () => {
+    const urlAndOptionRequest = new FetchRequest("post", "localhost/test?a=1&b=2", { query: { c: 3 } })
     expect(urlAndOptionRequest.url).toBe("localhost/test?a=1&b=2&c=3")
-
-    const urlRequest = new FetchRequest("post", "localhost/test?a=1&b=2#anchor")
+  })
+  test('only url', () => {
+    const urlRequest = new FetchRequest("post", "localhost/test?a=1&b=2")
     expect(urlRequest.url).toBe("localhost/test?a=1&b=2")
-
-    const optionRequest = new FetchRequest("post", "localhost/test#anchor", { query: { c: 3 } })
+  })
+  test('only options', () => {
+    const optionRequest = new FetchRequest("post", "localhost/test", { query: { c: 3 } })
     expect(optionRequest.url).toBe("localhost/test?c=3")
   })
-
-  test('query is merged from formData', () => {
+  test('options accept formData', () => {
     const formData = new FormData()
-    formData.append("c", 3)
+    formData.append("a", 1)
 
-    const urlAndOptionRequest = new FetchRequest("post", "localhost/test?a=1&b=2#anchor", { query: formData })
-    expect(urlAndOptionRequest.url).toBe("localhost/test?a=1&b=2&c=3")
-
-    const optionRequest = new FetchRequest("post", "localhost/test#anchor", { query: formData })
-    expect(optionRequest.url).toBe("localhost/test?c=3")
+    const urlAndOptionRequest = new FetchRequest("post", "localhost/test", { query: formData })
+    expect(urlAndOptionRequest.url).toBe("localhost/test?a=1")
   })
-
-  test('query is merged from urlSearchParams', () => {
+  test('options accept urlSearchParams', () => {
     const urlSearchParams = new URLSearchParams()
-    urlSearchParams.append("c", 3)
+    urlSearchParams.append("a", 1)
 
-    const urlAndOptionRequest = new FetchRequest("post", "localhost/test?a=1&b=2#anchor", { query: urlSearchParams })
-    expect(urlAndOptionRequest.url).toBe("localhost/test?a=1&b=2&c=3")
-
-    const optionRequest = new FetchRequest("post", "localhost/test#anchor", { query: urlSearchParams })
-    expect(optionRequest.url).toBe("localhost/test?c=3")
+    const urlAndOptionRequest = new FetchRequest("post", "localhost/test", { query: urlSearchParams })
+    expect(urlAndOptionRequest.url).toBe("localhost/test?a=1")
   })
-
   test('handles empty query', () => {
-    const emptyQueryRequest = new FetchRequest("get", "localhost/test#anchor")
-    expect(emptyQueryRequest.url).toBe("localhost/test#anchor")
+    const emptyQueryRequest = new FetchRequest("get", "localhost/test")
+    expect(emptyQueryRequest.url).toBe("localhost/test")
   })
 })

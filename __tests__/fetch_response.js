@@ -12,88 +12,160 @@ test('default contentType', async () => {
   expect(testResponse.contentType).toEqual("")
 })
 
-test('html getter retrieves response', async () => {
-  const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'application/html'}) })
-  const testResponse = new FetchResponse(mockResponse)
-
-  expect(testResponse.html).rejects.toBeInstanceOf(Error)
-})
-
-test('rejects body-getters with wrong contentType', async () => {
-  const mockResponse = new Response(JSON.stringify({ hello: 'you' }), { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
-  const testResponse = new FetchResponse(mockResponse)
-
-  expect(testResponse.html).rejects.toBeInstanceOf(Error)
-  expect(testResponse.json).rejects.toBeInstanceOf(Error)
-  expect(testResponse.renderTurboStream()).rejects.toBeInstanceOf(Error)
-})
-
-test('json can be retrieved multiple times', async () => {
-  const originalBody = { hello: 'you' } 
-  const mockResponse = new Response(JSON.stringify(originalBody), { status: 200, headers: new Headers({'Content-Type': 'application/json'}) })
-  const testResponse = new FetchResponse(mockResponse)
-
-  const firstInvokation = await testResponse.json
-  const secondInvokation = await testResponse.json
-  expect(originalBody).toStrictEqual(firstInvokation)
-  expect(firstInvokation).toStrictEqual(secondInvokation)
-})
-
-test('getters on 200-OK json request', async () => {
-  const mockBody = { some: "json" }
-  const mockHeaders = new Headers({'Content-Type': 'application/json; charset=exotic'})
-  const mockResponse = new Response(JSON.stringify(mockBody), { status: 200, headers: mockHeaders })
-  const testResponse = new FetchResponse(mockResponse)
-
-  expect(testResponse.statusCode).toBe(200)
-  expect(testResponse.ok).toBeTruthy()
-  expect(testResponse.redirected).toBeFalsy()  
-  expect(testResponse.unauthenticated).toBeFalsy()
-  expect(testResponse.unprocessableEntity).toBeFalsy()
-  expect(testResponse.authenticationURL).toBeNull()  
-  expect(testResponse.contentType).toBe('application/json')
-  expect(testResponse.headers).toStrictEqual(mockHeaders)
-  expect(await testResponse.json).toStrictEqual(mockBody)
-})
-
-test('getters on 302-Found request', async () => {
-  const mockHeaders = new Headers({'Location': 'https://localhost/login'})
-  const mockResponse = new Response(null, { status: 302, url: 'https://localhost/login', headers: mockHeaders })
-  jest.spyOn(mockResponse, 'redirected', 'get').mockReturnValue(true)
-  const testResponse = new FetchResponse(mockResponse)
-
-  expect(testResponse.statusCode).toBe(302)
-  expect(testResponse.ok).toBeFalsy()
-  expect(testResponse.redirected).toBeTruthy()
-  expect(testResponse.unauthenticated).toBeFalsy()
-  expect(testResponse.unprocessableEntity).toBeFalsy()
-  expect(testResponse.authenticationURL).toBeNull()
-})
-
-test('getters on 401-Found request', async () => {
-  const mockResponse = new Response(null, { status: 401, headers: new Headers({'WWW-Authenticate': 'https://localhost/login'}) })
-  const testResponse = new FetchResponse(mockResponse)
-
-  delete window.location
-  window.location = new URL('https://www.example.com/')
-  expect(window.location.href).toBe('https://www.example.com/')
-
-  const testRequest = new FetchRequest("get", "localhost")
-  expect(testRequest.perform()).rejects.toBe('https://localhost/login')
-
-  testRequest.perform().catch(() => {
-    expect(window.location.href).toBe('https://localhost/login')
+describe('body accessors', () => {
+  describe('text', () => {
+    test('works multiple times', async () => {
+      const mockResponse = new Response("Mock", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
+      const testResponse = new FetchResponse(mockResponse)
+    
+      expect(await testResponse.text).toBe("Mock")
+      expect(await testResponse.text).toBe("Mock")  
+    })
+    test('work regardless of content-type', async () => {
+      const mockResponse = new Response("Mock", { status: 200, headers: new Headers({'Content-Type': 'not/text'}) })
+      const testResponse = new FetchResponse(mockResponse)
+    
+      expect(await testResponse.text).toBe("Mock")  
+    })
   })
+  describe('html', () => {
+    test('works multiple times', async () => {
+      const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'application/html'}) })
+      const testResponse = new FetchResponse(mockResponse)
+    
+      expect(await testResponse.html).toBe("<h1>hi</h1>")
+      expect(await testResponse.html).toBe("<h1>hi</h1>")  
+    })
+    test('rejects on invalid content-type', async () => {
+      const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
+      const testResponse = new FetchResponse(mockResponse)
+    
+      expect(testResponse.html).rejects.toBeInstanceOf(Error)
+    })
+  })
+  describe('json', () => {
+    test('works multiple times', async () => {
+      const mockResponse = new Response(JSON.stringify({ json: 'body' }), { status: 200, headers: new Headers({'Content-Type': 'application/json'}) })
+      const testResponse = new FetchResponse(mockResponse)
+    
+      // works mutliple times
+      expect({ json: 'body' }).toStrictEqual(await testResponse.json)
+      expect({ json: 'body' }).toStrictEqual(await testResponse.json)
+    })
+    test('rejects on invalid content-type', async () => {
+      const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
+      const testResponse = new FetchResponse(mockResponse)
+    
+      expect(testResponse.json).rejects.toBeInstanceOf(Error)
+    })
+  })
+  describe('turbostream', () => {
+    const mockTurboStreamMessage = `
+      <turbo-stream action="append" target="mock_collection"><template>
+        <div id="mock_1">message</div>
+      </template></turbo-stream>`
 
+    test('warns if Turbo is not registered', async () => {
+      const mockResponse = new Response(mockTurboStreamMessage, { status: 200, headers: new Headers({'Content-Type': 'text/vnd.turbo-stream.html'}) })
+      const testResponse = new FetchResponse(mockResponse)
+      const warningSpy = jest.spyOn(console, 'warn').mockImplementation()
+
+      await testResponse.renderTurboStream()
+      
+      expect(warningSpy).toBeCalled()
+    })
+    test('calls turbo', async () => {
+      const mockResponse = new Response(mockTurboStreamMessage, { status: 200, headers: new Headers({'Content-Type': 'text/vnd.turbo-stream.html'}) })
+      const testResponse = new FetchResponse(mockResponse)
+      window.Turbo = { renderStreamMessage: jest.fn() }
+
+      await testResponse.renderTurboStream()
+      expect(window.Turbo.renderStreamMessage).toHaveBeenCalledTimes(1)
+    })
+    test('rejects on invalid content-type', async () => {
+      const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
+      const testResponse = new FetchResponse(mockResponse)
+    
+      expect(testResponse.renderTurboStream()).rejects.toBeInstanceOf(Error)
+    })
+  })
 })
 
-test('getters on 422-Found request', async () => {
-  const mockResponse = new Response(null, { status: 422 })
-  const testResponse = new FetchResponse(mockResponse)
+describe('fetch response helpers', () => {
+  test('forwards headers correctly', () => {
+    const mockHeaders = new Headers({'Content-Type': 'text/plain'})
+    const mockResponse = new Response(null, { status: 200, headers: mockHeaders })
+    const testResponse = new FetchResponse(mockResponse)
 
-  expect(testResponse.statusCode).toBe(422)
-  expect(testResponse.ok).toBeFalsy()
-  expect(testResponse.unauthenticated).toBeFalsy()
-  expect(testResponse.unprocessableEntity).toBeTruthy()
-  expect(testResponse.authenticationURL).toBeNull()
+    expect(testResponse.headers).toStrictEqual(mockHeaders)
+  })
+  test('content-type access the headers correctly', () => {
+    const mockHeaders = new Headers({'Content-Type': 'text/plain'})
+    const mockResponse = new Response(null, { status: 200, headers: mockHeaders })
+    const testResponse = new FetchResponse(mockResponse)
+
+    expect(testResponse.contentType).toBe('text/plain')
+  })
+  test('content-type cuts after semicolon', () => {
+    const mockHeaders = new Headers({'Content-Type': 'application/json; charset=exotic'})
+    const mockResponse = new Response(null, { status: 200, headers: mockHeaders })
+    const testResponse = new FetchResponse(mockResponse)
+
+    expect(testResponse.contentType).toBe('application/json')
+  })
+  test('www-authentication header is accessed', () => {
+    const mockResponse = new Response(null, { status: 401, headers: new Headers({'WWW-Authenticate': 'https://localhost/login'}) })
+    const testResponse = new FetchResponse(mockResponse)
+
+    expect(testResponse.authenticationURL).toBe('https://localhost/login')
+  })
+})
+describe('http-status helpers', () => {
+  
+  test('200', () => {
+    const mockResponse = new Response(null, { status: 200 })
+    const testResponse = new FetchResponse(mockResponse)
+  
+    expect(testResponse.statusCode).toBe(200)
+    expect(testResponse.ok).toBeTruthy()
+    expect(testResponse.redirected).toBeFalsy()  
+    expect(testResponse.unauthenticated).toBeFalsy()
+    expect(testResponse.unprocessableEntity).toBeFalsy()
+  })
+  
+  test('401', () => {
+    const mockResponse = new Response(null, { status: 401 })
+    const testResponse = new FetchResponse(mockResponse)
+  
+    expect(testResponse.statusCode).toBe(401)
+    expect(testResponse.ok).toBeFalsy()
+    expect(testResponse.redirected).toBeFalsy()  
+    expect(testResponse.unauthenticated).toBeTruthy()
+    expect(testResponse.unprocessableEntity).toBeFalsy()
+  })
+  
+  test('422', () => {
+    const mockResponse = new Response(null, { status: 422 })
+    const testResponse = new FetchResponse(mockResponse)
+  
+    expect(testResponse.statusCode).toBe(422)
+    expect(testResponse.ok).toBeFalsy()
+    expect(testResponse.redirected).toBeFalsy()  
+    expect(testResponse.unauthenticated).toBeFalsy()
+    expect(testResponse.unprocessableEntity).toBeTruthy()
+  })
+  
+  test('302', () => {
+    const mockHeaders = new Headers({'Location': 'https://localhost/login'})
+    const mockResponse = new Response(null, { status: 302, url: 'https://localhost/login', headers: mockHeaders })
+    jest.spyOn(mockResponse, 'redirected', 'get').mockReturnValue(true)
+    const testResponse = new FetchResponse(mockResponse)
+  
+    expect(testResponse.statusCode).toBe(302)
+    expect(testResponse.ok).toBeFalsy()
+    expect(testResponse.redirected).toBeTruthy()
+    expect(testResponse.unauthenticated).toBeFalsy()
+    expect(testResponse.unprocessableEntity).toBeFalsy()
+    expect(testResponse.authenticationURL).toBeNull()
+  })
 })
