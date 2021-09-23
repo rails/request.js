@@ -9,7 +9,6 @@ beforeEach(() => {
 })
 
 test('request intercepter is executed', async () => {
-  // const mockInterceptor = jest.fn().mockResolvedValue("hi!")
   const mockInterceptor =  jest.fn(() => {
     return Promise.resolve("hi!")
   })

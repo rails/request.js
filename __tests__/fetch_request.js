@@ -151,7 +151,7 @@ describe('header handling', () => {
     expect(request.fetchOptions.body).toBe(JSON.stringify(jsonBody))
   })
 
-  test('not serializes JSON with explicit different contentTyp', () => {
+  test('not serializes JSON with explicit different contentType', () => {
     const jsonBody = { some: "json" }
     const request = new FetchRequest("get", "localhost", { body: jsonBody, contentType: "not/json" })
     expect(request.fetchOptions.body).toBe(jsonBody)
