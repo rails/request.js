@@ -167,11 +167,6 @@ describe('header handling', () => {
     
     request = new FetchRequest("get", "localhost")
     expect(request.fetchOptions.redirect).toBe("follow")
-
-    // maybe check for valid values and default to follow?
-    // https://developer.mozilla.org/en-US/docs/Web/API/Request/redirect
-    request = new FetchRequest("get", "localhost", { redirect: "nonsense"})
-    expect(request.fetchOptions.redirect).toBe("nonsense")
   })
 
   test('sets signal', () => {
