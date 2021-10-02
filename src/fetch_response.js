@@ -64,7 +64,7 @@ export class FetchResponse {
   async renderTurboStream () {
     if (this.isTurboStream) {
       if (window.Turbo) {
-        window.Turbo.renderStreamMessage(await this.text)
+        await window.Turbo.renderStreamMessage(await this.text)
       } else {
         console.warn('You must set `window.Turbo = Turbo` to automatically process Turbo Stream events with request.js')
       }

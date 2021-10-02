@@ -26,7 +26,7 @@ export class FetchRequest {
     }
 
     if (response.ok && response.isTurboStream) {
-      response.renderTurboStream()
+      await response.renderTurboStream()
     }
 
     return response
