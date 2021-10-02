@@ -114,7 +114,7 @@ export class FetchRequest {
   }
 
   get url () {
-    return this.originalUrl.split('?')[0] + this.query
+    return (this.originalUrl.split('?')[0]).split('#')[0] + this.query
   }
 
   get responseKind () {
