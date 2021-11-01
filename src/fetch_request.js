@@ -26,7 +26,7 @@ export class FetchRequest {
     }
 
     if (response.ok && response.isTurboStream) {
-      response.renderTurboStream()
+      await response.renderTurboStream()
     }
 
     return response
@@ -114,7 +114,7 @@ export class FetchRequest {
   }
 
   get url () {
-    return this.originalUrl.split('?')[0] + this.query
+    return (this.originalUrl.split('?')[0]).split('#')[0] + this.query
   }
 
   get responseKind () {

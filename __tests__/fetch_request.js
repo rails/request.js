@@ -167,11 +167,6 @@ describe('header handling', () => {
     
     request = new FetchRequest("get", "localhost")
     expect(request.fetchOptions.redirect).toBe("follow")
-
-    // maybe check for valid values and default to follow?
-    // https://developer.mozilla.org/en-US/docs/Web/API/Request/redirect
-    request = new FetchRequest("get", "localhost", { redirect: "nonsense"})
-    expect(request.fetchOptions.redirect).toBe("nonsense")
   })
 
   test('sets signal', () => {
@@ -196,10 +191,14 @@ describe('header handling', () => {
 
 describe('query params are parsed', () => {
   test('anchors are rejected', () => {
-    const testRequest = new FetchRequest("post", "localhost/test?a=1&b=2#anchor", { query: { c: 3 } })
-    expect(testRequest.url).toBe("localhost/test?a=1&b=2&c=3")
-    // const brokenRequest = new FetchRequest("post", "localhost/test#anchor", { query: { a: 1, b: 2, c: 3 } })
-    // expect(brokenRequest.url).toBe("localhost/test?a=1&b=2&c=3")
+    const mixedRequest = new FetchRequest("post", "localhost/test?a=1&b=2#anchor", { query: { c: 3 } })
+    expect(mixedRequest.url).toBe("localhost/test?a=1&b=2&c=3")
+
+    const queryRequest = new FetchRequest("post", "localhost/test?a=1&b=2&c=3#anchor")
+    expect(queryRequest.url).toBe("localhost/test?a=1&b=2&c=3")
+
+    const optionsRequest = new FetchRequest("post", "localhost/test#anchor", { query: { a: 1, b: 2, c: 3 } })
+    expect(optionsRequest.url).toBe("localhost/test?a=1&b=2&c=3")
   })
   test('url and options are merged', () => {
     const urlAndOptionRequest = new FetchRequest("post", "localhost/test?a=1&b=2", { query: { c: 3 } })
