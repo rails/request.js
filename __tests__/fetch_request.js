@@ -66,6 +66,11 @@ test('treat method name case-insensitive', async () => {
   }
 })
 
+test('casts URL to String', async () => {
+  const testRequest = new FetchRequest("GET", new URL("http://localhost"))
+  expect(typeof testRequest.originalUrl).toBe("string")
+})
+
 describe('header handling', () => {
   const defaultHeaders = {
     'X-Requested-With': 'XMLHttpRequest',

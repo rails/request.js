@@ -6,7 +6,7 @@ export class FetchRequest {
   constructor (method, url, options = {}) {
     this.method = method
     this.options = options
-    this.originalUrl = url
+    this.originalUrl = url.toString()
   }
 
   async perform () {
