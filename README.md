@@ -148,9 +148,11 @@ function hideProgressBar() {
 }
 
 export function withProgress(request) {
-  return new Promise(resolve => {
-    showProgressBar()
-    resolve(request.then(hideProgressBar))
+  showProgressBar()
+
+  return request.then((response) => {
+    hideProgressBar()
+    return response
   })
 }
 
