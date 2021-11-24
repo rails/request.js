@@ -129,6 +129,39 @@ RequestInterceptor.register(async (request) => {
 RequestInterceptor.reset()
 ```
 
+#### Before and after hooks
+
+Wrap the request `Promise` with your own code. Just pure and simple JavaScript like this:
+
+```javascript
+import { FetchRequest } from "@rails/request.js"
+import { navigator } from "@hotwired/turbo"
+
+function showProgressBar() {
+  navigator.delegate.adapter.progressBar.setValue(0)
+  navigator.delegate.adapter.progressBar.show()
+}
+
+function hideProgressBar() {
+  navigator.delegate.adapter.progressBar.setValue(1)
+  navigator.delegate.adapter.progressBar.hide()
+}
+
+export function withProgress(request) {
+  showProgressBar()
+
+  return request.then((response) => {
+    hideProgressBar()
+    return response
+  })
+}
+
+export function get(url, options) {
+  const request = new FetchRequest("get", url, options)
+  return withProgress(request.perform())
+}
+```
+
 ## Response
 
 ### statusCode
