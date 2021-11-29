@@ -84,7 +84,7 @@ export class FetchRequest {
       case 'turbo-stream':
         return 'text/vnd.turbo-stream.html, text/html, application/xhtml+xml'
       case 'json':
-        return 'application/json'
+        return 'application/json, application/vnd.api+json'
       default:
         return '*/*'
     }

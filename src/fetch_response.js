@@ -46,7 +46,7 @@ export class FetchResponse {
   }
 
   get json () {
-    if (this.contentType.match(/^application\/json/)) {
+    if (this.contentType.match(/^application\/.*json$/)) {
       return this.responseJson || (this.responseJson = this.response.json())
     }
 
