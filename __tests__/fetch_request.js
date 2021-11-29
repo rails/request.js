@@ -91,7 +91,7 @@ describe('header handling', () => {
     test('json', async () => {
       const jsonRequest = new FetchRequest("get", "localhost", { responseKind: 'json' })
       expect(jsonRequest.fetchOptions.headers)
-        .toStrictEqual({...defaultHeaders, 'Accept' : 'application/json'})
+        .toStrictEqual({...defaultHeaders, 'Accept' : 'application/json, application/vnd.api+json'})
     })
     test('turbo-stream', async () => {
       const turboRequest = new FetchRequest("get", "localhost", { responseKind: 'turbo-stream' })

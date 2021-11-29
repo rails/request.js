@@ -52,9 +52,24 @@ describe('body accessors', () => {
       expect({ json: 'body' }).toStrictEqual(await testResponse.json)
     })
     test('rejects on invalid content-type', async () => {
-      const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
+      const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/json'}) })
       const testResponse = new FetchResponse(mockResponse)
     
+      expect(testResponse.json).rejects.toBeInstanceOf(Error)
+    })
+  })
+  describe('application/vnd.api+json', () => {
+    test('works multiple times', async () => {
+      const mockResponse = new Response(JSON.stringify({ json: 'body' }), { status: 200, headers: new Headers({'Content-Type': 'application/vnd.api+json'}) })
+      const testResponse = new FetchResponse(mockResponse)
+
+      expect({ json: 'body' }).toStrictEqual(await testResponse.json)
+      expect({ json: 'body' }).toStrictEqual(await testResponse.json)
+    })
+    test('rejects on invalid content-type', async () => {
+      const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'application/plain'}) })
+      const testResponse = new FetchResponse(mockResponse)
+
       expect(testResponse.json).rejects.toBeInstanceOf(Error)
     })
   })
