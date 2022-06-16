@@ -22,11 +22,11 @@ describe('perform', () => {
 
     const testRequest = new FetchRequest("get", "localhost")
     const testResponse = await testRequest.perform()
-  
+
     expect(window.fetch).toHaveBeenCalledTimes(1)
     expect(window.fetch).toHaveBeenCalledWith("localhost", testRequest.fetchOptions)
     expect(testResponse).toStrictEqual(new FetchResponse(mockResponse))
-  })  
+  })
 
   test('request is performed with 401', async () => {
     const mockResponse = new Response(undefined, { status: 401, headers: {'WWW-Authenticate': 'https://localhost/login'}})
@@ -111,20 +111,20 @@ describe('header handling', () => {
       expect(customRequest.fetchOptions.headers)
         .toStrictEqual({ ...defaultHeaders, "Content-Type": 'any/thing'})
     })
-    test('is not set by formData', () => {  
+    test('is not set by formData', () => {
       const formData = new FormData()
       formData.append("this", "value")
       const formDataRequest = new FetchRequest("get", "localhost", { body: formData })
       expect(formDataRequest.fetchOptions.headers)
         .toStrictEqual(defaultHeaders)
     })
-    test('is set by file body', () => {      
+    test('is set by file body', () => {
       const file = new File(["contenxt"], "file.txt", { type: "text/plain" })
       const fileRequest = new FetchRequest("get", "localhost", { body: file })
       expect(fileRequest.fetchOptions.headers)
-        .toStrictEqual({ ...defaultHeaders, "Content-Type": "text/plain"})    
+        .toStrictEqual({ ...defaultHeaders, "Content-Type": "text/plain"})
     })
-    test('is set by json body', () => {      
+    test('is set by json body', () => {
       const jsonRequest = new FetchRequest("get", "localhost", { body: { some: "json"} })
       expect(jsonRequest.fetchOptions.headers)
         .toStrictEqual({ ...defaultHeaders, "Content-Type": "application/json"})
@@ -138,13 +138,13 @@ describe('header handling', () => {
     request.addHeader("test", "header")
     expect(request.fetchOptions.headers)
       .toStrictEqual({ ...defaultHeaders, custom: "Header", "Content-Type": "application/json", "test": "header"})
-  })    
+  })
 
   test('headers win over contentType', () => {
     const request = new FetchRequest("get", "localhost", { contentType: "application/json", headers: { "Content-Type": "this/overwrites" } })
     expect(request.fetchOptions.headers)
       .toStrictEqual({ ...defaultHeaders, "Content-Type": "this/overwrites"})
-  })    
+  })
 
   test('serializes JSON to String', () => {
     const jsonBody = { some: "json" }
@@ -169,7 +169,7 @@ describe('header handling', () => {
       request = new FetchRequest("get", "localhost", { redirect })
       expect(request.fetchOptions.redirect).toBe(redirect)
     }
-    
+
     request = new FetchRequest("get", "localhost")
     expect(request.fetchOptions.redirect).toBe("follow")
   })
@@ -191,7 +191,30 @@ describe('header handling', () => {
     // has no effect
     request = new FetchRequest("get", "localhost", { credentials: "omit"})
     expect(request.fetchOptions.credentials).toBe('same-origin')
-  })  
+  })
+
+  describe('csrf token inclusion', () => {
+    // window.location.hostname is "localhost" in the test suite
+    test('csrf token is not included in headers if url hostname is not the same as window.location', () => {
+      const request = new FetchRequest("get", "http://removeservice.com/test.json")
+      expect(request.fetchOptions.headers).not.toHaveProperty("X-CSRF-Token")
+    })
+
+    test('csrf token is included in headers if url hostname is the same as window.location', () => {
+      const request = new FetchRequest("get", "http://localhost/test.json")
+      expect(request.fetchOptions.headers).toHaveProperty("X-CSRF-Token")
+    })
+
+    test('csrf token is included if url is a realative path', async () => {
+      const defaultRequest = new FetchRequest("get", "/somepath")
+      expect(defaultRequest.fetchOptions.headers).toHaveProperty("X-CSRF-Token")
+    })
+
+    test('csrf token is included if url is not parseable', async () => {
+      const defaultRequest = new FetchRequest("get", "not-a-url")
+      expect(defaultRequest.fetchOptions.headers).toHaveProperty("X-CSRF-Token")
+    })
+  })
 })
 
 describe('query params are parsed', () => {
