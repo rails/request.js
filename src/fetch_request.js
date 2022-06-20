@@ -38,6 +38,18 @@ export class FetchRequest {
     this.options.headers = headers
   }
 
+  sameHostname () {
+    if (!this.originalUrl.startsWith('http:')) {
+      return true
+    }
+
+    try {
+      return new URL(this.originalUrl).hostname === window.location.hostname
+    } catch (_) {
+      return true
+    }
+  }
+
   get fetchOptions () {
     return {
       method: this.method.toUpperCase(),
@@ -50,14 +62,18 @@ export class FetchRequest {
   }
 
   get headers () {
+    const baseHeaders = {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': this.contentType,
+      Accept: this.accept
+    }
+
+    if (this.sameHostname()) {
+      baseHeaders['X-CSRF-Token'] = this.csrfToken
+    }
+
     return compact(
-      Object.assign({
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRF-Token': this.csrfToken,
-        'Content-Type': this.contentType,
-        Accept: this.accept
-      },
-      this.additionalHeaders)
+      Object.assign(baseHeaders, this.additionalHeaders)
     )
   }
 
