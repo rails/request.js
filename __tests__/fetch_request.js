@@ -254,6 +254,14 @@ describe('query params are parsed', () => {
     const urlAndOptionRequest = new FetchRequest("post", "localhost/test", { query: urlSearchParams })
     expect(urlAndOptionRequest.url).toBe("localhost/test?a=1")
   })
+  test('urlSearchParams with list entries', () => {
+    const urlSearchParams = new URLSearchParams()
+    urlSearchParams.append("a[]", 1)
+    urlSearchParams.append("a[]", 2)
+
+    const urlAndOptionRequest = new FetchRequest("post", "localhost/test", {query: urlSearchParams})
+    expect(urlAndOptionRequest.url).toBe("localhost/test?a%5B%5D=1&a%5B%5D=2")
+  });
   test('handles empty query', () => {
     const emptyQueryRequest = new FetchRequest("get", "localhost/test")
     expect(emptyQueryRequest.url).toBe("localhost/test")
