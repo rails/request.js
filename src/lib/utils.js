@@ -40,7 +40,7 @@ export function mergeEntries (searchParams, entries) {
   for (const [name, value] of entries) {
     if (value instanceof window.File) continue
 
-    if (searchParams.has(name)) {
+    if (searchParams.has(name) && !name.includes('[]')) {
       searchParams.delete(name)
       searchParams.set(name, value)
     } else {
