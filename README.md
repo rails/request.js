@@ -21,7 +21,7 @@ yarn add @rails/request.js
 
 # How to use
 
-Just import the `FetchRequest` class from the package and instantiate it passing the request `method`, `url`, `options`,  then call `await request.perform()` and do what do you need with the response.
+Just import the `FetchRequest` class from the package and instantiate it passing the request `method`, `url`, `options`,  then call `await request.perform()` and do what you need with the response.
 
 Example:
 
