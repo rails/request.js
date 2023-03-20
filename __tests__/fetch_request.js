@@ -44,7 +44,7 @@ describe('perform', () => {
     })
   })
 
-  test('turbo stream request automatically calls renderTurboStream', async () => {
+  test('turbo stream request automatically calls renderTurboStream when status is ok', async () => {
     const mockResponse = new Response('', { status: 200, headers: { 'Content-Type': 'text/vnd.turbo-stream.html' }})
     window.fetch = jest.fn().mockResolvedValue(mockResponse)
     jest.spyOn(FetchResponse.prototype, "ok", "get").mockReturnValue(true)
@@ -55,6 +55,21 @@ describe('perform', () => {
     await testRequest.perform()
 
     expect(renderSpy).toHaveBeenCalledTimes(1)
+    jest.clearAllMocks();
+  })
+
+  test('turbo stream request automatically calls renderTurboStream when status is unprocessable entity', async () => {
+    const mockResponse = new Response('', { status: 422, headers: { 'Content-Type': 'text/vnd.turbo-stream.html' }})
+    window.fetch = jest.fn().mockResolvedValue(mockResponse)
+    jest.spyOn(FetchResponse.prototype, "ok", "get").mockReturnValue(true)
+    jest.spyOn(FetchResponse.prototype, "isTurboStream", "get").mockReturnValue(true)
+    const renderSpy = jest.spyOn(FetchResponse.prototype, "renderTurboStream").mockImplementation()
+
+    const testRequest = new FetchRequest("get", "localhost")
+    await testRequest.perform()
+
+    expect(renderSpy).toHaveBeenCalledTimes(1)
+    jest.clearAllMocks();
   })
 })
 

@@ -25,7 +25,9 @@ export class FetchRequest {
       return Promise.reject(window.location.href = response.authenticationURL)
     }
 
-    if (response.ok && response.isTurboStream) {
+    const responseStatusIsTurboStreamable = response.ok || response.unprocessableEntity
+
+    if (responseStatusIsTurboStreamable && response.isTurboStream) {
       await response.renderTurboStream()
     }
 
