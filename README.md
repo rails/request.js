@@ -88,6 +88,10 @@ When provided this value will be sent in the `Content-Type` header. When not pro
 
 Adds additional headers to the request.  `X-CSRF-Token` and `Content-Type` are automatically included.
 
+##### credentials
+
+Specifies the `credentials` option. Default is `same-origin`.
+
 ##### query
 
 Appends query parameters to the URL. Query params in the URL are preserved and merged with the query options.

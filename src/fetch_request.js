@@ -58,7 +58,7 @@ export class FetchRequest {
       headers: this.headers,
       body: this.formattedBody,
       signal: this.signal,
-      credentials: 'same-origin',
+      credentials: this.credentials,
       redirect: this.redirect
     }
   }
@@ -145,6 +145,10 @@ export class FetchRequest {
 
   get redirect () {
     return this.options.redirect || 'follow'
+  }
+
+  get credentials () {
+    return this.options.credentials || 'same-origin'
   }
 
   get additionalHeaders () {
