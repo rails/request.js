@@ -198,14 +198,13 @@ describe('header handling', () => {
     expect(request.fetchOptions.signal).toBe("signal")
   })
 
-  test('has fixed credentials setting which cannot be changed', () => {
+  test('has credentials setting which can be changed', () => {
     let request
     request = new FetchRequest("get", "localhost")
     expect(request.fetchOptions.credentials).toBe('same-origin')
 
-    // has no effect
-    request = new FetchRequest("get", "localhost", { credentials: "omit"})
-    expect(request.fetchOptions.credentials).toBe('same-origin')
+    request = new FetchRequest("get", "localhost", { credentials: "include"})
+    expect(request.fetchOptions.credentials).toBe('include')
   })
 
   describe('csrf token inclusion', () => {
