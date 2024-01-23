@@ -215,4 +215,4 @@ you will not be able to check if the request was redirected.
 
 Rails Request.JS is released under the [MIT License](LICENSE).
 
-© 2021 Basecamp, LLC.
+© 37signals, LLC.
