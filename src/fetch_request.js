@@ -25,6 +25,10 @@ export class FetchRequest {
       return Promise.reject(window.location.href = response.authenticationURL)
     }
 
+    if (response.isScript) {
+      await response.activeScript()
+    }
+
     const responseStatusIsTurboStreamable = response.ok || response.unprocessableEntity
 
     if (responseStatusIsTurboStreamable && response.isTurboStream) {
@@ -103,6 +107,8 @@ export class FetchRequest {
         return 'text/vnd.turbo-stream.html, text/html, application/xhtml+xml'
       case 'json':
         return 'application/json, application/vnd.api+json'
+      case 'script':
+        return 'text/javascript, application/javascript'
       default:
         return '*/*'
     }

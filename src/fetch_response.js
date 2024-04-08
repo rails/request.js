@@ -61,6 +61,10 @@ export class FetchResponse {
     return this.contentType.match(/^text\/vnd\.turbo-stream\.html/)
   }
 
+  get isScript () {
+    return this.contentType.match(/\bjavascript\b/)
+  }
+
   async renderTurboStream () {
     if (this.isTurboStream) {
       if (window.Turbo) {
@@ -70,6 +74,16 @@ export class FetchResponse {
       }
     } else {
       return Promise.reject(new Error(`Expected a Turbo Stream response but got "${this.contentType}" instead`))
+    }
+  }
+
+  async activeScript () {
+    if (this.isScript) {
+      const script = document.createElement('script')
+      script.innerHTML = await this.text
+      document.body.appendChild(script)
+    } else {
+      return Promise.reject(new Error(`Expected a Script response but got "${this.contentType}" instead`))
     }
   }
 }
