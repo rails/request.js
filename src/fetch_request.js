@@ -20,7 +20,8 @@ export class FetchRequest {
     }
 
     const fetch = (this.responseKind === 'turbo-stream' && window.Turbo)
-      ? window.Turbo.fetch : window.fetch
+      ? window.Turbo.fetch
+      : window.fetch
 
     const response = new FetchResponse(await fetch(this.url, this.fetchOptions))
 
