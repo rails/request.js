@@ -281,3 +281,34 @@ describe('query params are parsed', () => {
     expect(emptyQueryRequest.url).toBe("localhost/test")
   })
 })
+
+
+describe('turbostream', () => {
+  test('turbo fetch is called for turbo-stream responseKind', async() => {
+    const mockResponse = new Response("success!", { status: 200 })
+
+    window.fetch = jest.fn().mockResolvedValue(mockResponse)
+    window.Turbo = { fetch: jest.fn().mockResolvedValue(mockResponse) }
+
+    const testRequest = new FetchRequest("get", "localhost", { responseKind: 'turbo-stream' })
+    const testResponse = await testRequest.perform()
+
+    expect(window.Turbo.fetch).toHaveBeenCalledTimes(1)
+    expect(window.fetch).toHaveBeenCalledTimes(0)
+    expect(testResponse).toStrictEqual(new FetchResponse(mockResponse))
+  })
+
+  test('turbo fetch is called for other responseKind', async() => {
+    const mockResponse = new Response("success!", { status: 200 })
+
+    window.fetch = jest.fn().mockResolvedValue(mockResponse)
+    window.Turbo = { fetch: jest.fn().mockResolvedValue(mockResponse) }
+
+    const testRequest = new FetchRequest("get", "localhost")
+    const testResponse = await testRequest.perform()
+
+    expect(window.Turbo.fetch).toHaveBeenCalledTimes(0)
+    expect(window.fetch).toHaveBeenCalledTimes(1)
+    expect(testResponse).toStrictEqual(new FetchResponse(mockResponse))
+  })
+})
