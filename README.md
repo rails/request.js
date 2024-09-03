@@ -102,7 +102,7 @@ Accepts `Object`, `FormData` or `URLSearchParams`.
 
 Specifies which response format will be accepted. Default is `html`.
 
-Options are `html`, `turbo-stream`, `json`.
+Options are `html`, `turbo-stream`, `json`, and `script`.
 
 #### Turbo Streams
 
@@ -114,6 +114,12 @@ window.Turbo = Turbo
 ```
 
 Since [v7.0.0-beta.6](https://github.com/hotwired/turbo/releases/tag/v7.0.0-beta.6) Turbo sets `window.Turbo` automatically.
+
+Request.JS will also use Turbo's `fetch` to include the `X-Turbo-Request-ID` header in the request (see [#73](https://github.com/rails/request.js/issues/73)).
+
+#### Script Responses
+
+Request.JS will automatically activate script tags in the response (see [#48](https://github.com/rails/request.js/issues/48)).
 
 #### Request Interceptor
 
