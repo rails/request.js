@@ -1,1 +1,3 @@
 rollup.config.js
+__tests__/
+.github/
