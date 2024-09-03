@@ -16,29 +16,29 @@ describe('body accessors', () => {
     test('works multiple times', async () => {
       const mockResponse = new Response("Mock", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
       const testResponse = new FetchResponse(mockResponse)
-    
+
       expect(await testResponse.text).toBe("Mock")
-      expect(await testResponse.text).toBe("Mock")  
+      expect(await testResponse.text).toBe("Mock")
     })
     test('work regardless of content-type', async () => {
       const mockResponse = new Response("Mock", { status: 200, headers: new Headers({'Content-Type': 'not/text'}) })
       const testResponse = new FetchResponse(mockResponse)
-    
-      expect(await testResponse.text).toBe("Mock")  
+
+      expect(await testResponse.text).toBe("Mock")
     })
   })
   describe('html', () => {
     test('works multiple times', async () => {
       const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'application/html'}) })
       const testResponse = new FetchResponse(mockResponse)
-    
+
       expect(await testResponse.html).toBe("<h1>hi</h1>")
-      expect(await testResponse.html).toBe("<h1>hi</h1>")  
+      expect(await testResponse.html).toBe("<h1>hi</h1>")
     })
     test('rejects on invalid content-type', async () => {
       const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
       const testResponse = new FetchResponse(mockResponse)
-    
+
       expect(testResponse.html).rejects.toBeInstanceOf(Error)
     })
   })
@@ -46,7 +46,7 @@ describe('body accessors', () => {
     test('works multiple times', async () => {
       const mockResponse = new Response(JSON.stringify({ json: 'body' }), { status: 200, headers: new Headers({'Content-Type': 'application/json'}) })
       const testResponse = new FetchResponse(mockResponse)
-    
+
       // works mutliple times
       expect({ json: 'body' }).toStrictEqual(await testResponse.json)
       expect({ json: 'body' }).toStrictEqual(await testResponse.json)
@@ -54,7 +54,7 @@ describe('body accessors', () => {
     test('rejects on invalid content-type', async () => {
       const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/json'}) })
       const testResponse = new FetchResponse(mockResponse)
-    
+
       expect(testResponse.json).rejects.toBeInstanceOf(Error)
     })
   })
@@ -85,7 +85,7 @@ describe('body accessors', () => {
       const warningSpy = jest.spyOn(console, 'warn').mockImplementation()
 
       await testResponse.renderTurboStream()
-      
+
       expect(warningSpy).toBeCalled()
     })
     test('calls turbo', async () => {
@@ -99,8 +99,16 @@ describe('body accessors', () => {
     test('rejects on invalid content-type', async () => {
       const mockResponse = new Response("<h1>hi</h1>", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
       const testResponse = new FetchResponse(mockResponse)
-    
+
       expect(testResponse.renderTurboStream()).rejects.toBeInstanceOf(Error)
+    })
+  })
+  describe('script', () => {
+    test('rejects on invalid content-type', async () => {
+      const mockResponse = new Response("", { status: 200, headers: new Headers({'Content-Type': 'text/plain'}) })
+      const testResponse = new FetchResponse(mockResponse)
+
+      expect(testResponse.activeScript()).rejects.toBeInstanceOf(Error)
     })
   })
 })
@@ -135,46 +143,46 @@ describe('fetch response helpers', () => {
   })
 })
 describe('http-status helpers', () => {
-  
+
   test('200', () => {
     const mockResponse = new Response(null, { status: 200 })
     const testResponse = new FetchResponse(mockResponse)
-  
+
     expect(testResponse.statusCode).toBe(200)
     expect(testResponse.ok).toBeTruthy()
-    expect(testResponse.redirected).toBeFalsy()  
+    expect(testResponse.redirected).toBeFalsy()
     expect(testResponse.unauthenticated).toBeFalsy()
     expect(testResponse.unprocessableEntity).toBeFalsy()
   })
-  
+
   test('401', () => {
     const mockResponse = new Response(null, { status: 401 })
     const testResponse = new FetchResponse(mockResponse)
-  
+
     expect(testResponse.statusCode).toBe(401)
     expect(testResponse.ok).toBeFalsy()
-    expect(testResponse.redirected).toBeFalsy()  
+    expect(testResponse.redirected).toBeFalsy()
     expect(testResponse.unauthenticated).toBeTruthy()
     expect(testResponse.unprocessableEntity).toBeFalsy()
   })
-  
+
   test('422', () => {
     const mockResponse = new Response(null, { status: 422 })
     const testResponse = new FetchResponse(mockResponse)
-  
+
     expect(testResponse.statusCode).toBe(422)
     expect(testResponse.ok).toBeFalsy()
-    expect(testResponse.redirected).toBeFalsy()  
+    expect(testResponse.redirected).toBeFalsy()
     expect(testResponse.unauthenticated).toBeFalsy()
     expect(testResponse.unprocessableEntity).toBeTruthy()
   })
-  
+
   test('302', () => {
     const mockHeaders = new Headers({'Location': 'https://localhost/login'})
     const mockResponse = new Response(null, { status: 302, url: 'https://localhost/login', headers: mockHeaders })
     jest.spyOn(mockResponse, 'redirected', 'get').mockReturnValue(true)
     const testResponse = new FetchResponse(mockResponse)
-  
+
     expect(testResponse.statusCode).toBe(302)
     expect(testResponse.ok).toBeFalsy()
     expect(testResponse.redirected).toBeTruthy()

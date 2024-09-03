@@ -71,6 +71,20 @@ describe('perform', () => {
     expect(renderSpy).toHaveBeenCalledTimes(1)
     jest.clearAllMocks();
   })
+
+  test('script request automatically calls activeScript', async () => {
+    const mockResponse = new Response('', { status: 200, headers: { 'Content-Type': 'application/javascript' }})
+    window.fetch = jest.fn().mockResolvedValue(mockResponse)
+    jest.spyOn(FetchResponse.prototype, "ok", "get").mockReturnValue(true)
+    jest.spyOn(FetchResponse.prototype, "isScript", "get").mockReturnValue(true)
+    const renderSpy = jest.spyOn(FetchResponse.prototype, "activeScript").mockImplementation()
+
+    const testRequest = new FetchRequest("get", "localhost")
+    await testRequest.perform()
+
+    expect(renderSpy).toHaveBeenCalledTimes(1)
+    jest.clearAllMocks();
+  })
 })
 
 test('treat method name case-insensitive', async () => {

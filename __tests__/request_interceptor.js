@@ -1,11 +1,12 @@
 /**
  * @jest-environment jsdom
  */
+import 'isomorphic-fetch'
 import { RequestInterceptor } from '../src/request_interceptor'
 import { FetchRequest } from '../src/fetch_request'
 
 beforeEach(() => {
-  window.fetch = jest.fn().mockResolvedValue({ status: 200, body: "done" })
+  window.fetch = jest.fn().mockResolvedValue(new Response("success!", { status: 200, body: "done" }))
 })
 
 test('request intercepter is executed', async () => {
