@@ -62,7 +62,7 @@ export class FetchResponse {
   }
 
   get isScript () {
-    return this.contentType.match(/\bjavascript\b/)
+    return this.contentType.match(/\b(?:java|ecma)script\b/)
   }
 
   async renderTurboStream () {
@@ -80,6 +80,9 @@ export class FetchResponse {
   async activeScript () {
     if (this.isScript) {
       const script = document.createElement('script')
+      const metaTag = document.querySelector("meta[name=csp-nonce]");
+      const nonce = metaTag && metaTag.content;
+      if (nonce) { script.setAttribute("nonce", nonce) }
       script.innerHTML = await this.text
       document.body.appendChild(script)
     } else {
