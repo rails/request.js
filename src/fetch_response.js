@@ -81,8 +81,10 @@ export class FetchResponse {
     if (this.isScript) {
       const script = document.createElement('script')
       const metaTag = document.querySelector('meta[name=csp-nonce]')
-      const nonce = metaTag && metaTag.content
-      if (nonce) { script.setAttribute('nonce', nonce) }
+      if (metaTag) {
+        const nonce = metaTag.nonce === '' ? metaTag.content : metaTag.nonce
+        if (nonce) { script.setAttribute('nonce', nonce) }
+      }
       script.innerHTML = await this.text
       document.body.appendChild(script)
     } else {
