@@ -49,7 +49,7 @@ export class FetchRequest {
   }
 
   sameHostname () {
-    if (!this.originalUrl.startsWith('http:')) {
+    if (!this.originalUrl.startsWith('http:') && !this.originalUrl.startsWith('https:')) {
       return true
     }
 

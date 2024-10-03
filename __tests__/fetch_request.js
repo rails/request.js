@@ -223,8 +223,13 @@ describe('header handling', () => {
 
   describe('csrf token inclusion', () => {
     // window.location.hostname is "localhost" in the test suite
-    test('csrf token is not included in headers if url hostname is not the same as window.location', () => {
+    test('csrf token is not included in headers if url hostname is not the same as window.location (http)', () => {
       const request = new FetchRequest("get", "http://removeservice.com/test.json")
+      expect(request.fetchOptions.headers).not.toHaveProperty("X-CSRF-Token")
+    })
+
+    test('csrf token is not included in headers if url hostname is not the same as window.location (https)', () => {
+      const request = new FetchRequest("get", "https://removeservice.com/test.json")
       expect(request.fetchOptions.headers).not.toHaveProperty("X-CSRF-Token")
     })
 
