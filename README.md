@@ -55,6 +55,7 @@ import { get, post, put, patch, destroy } from '@rails/request.js'
 async myMethod () {
   const response = await post('localhost:3000/my_endpoint', { body: JSON.stringify({ name: 'Request.JS' }) })
   if (response.ok) {
+    const body = await response.json
     ...
   }
 }
