@@ -221,6 +221,15 @@ describe('header handling', () => {
     expect(request.fetchOptions.credentials).toBe('include')
   })
 
+  test('has keepalive setting which can be changed', () => {
+    let request
+    request = new FetchRequest("get", "localhost")
+    expect(request.fetchOptions.keepalive).toBe(false)
+
+    request = new FetchRequest("get", "localhost", { keepalive: true})
+    expect(request.fetchOptions.keepalive).toBe(true)
+  })
+
   describe('csrf token inclusion', () => {
     // window.location.hostname is "localhost" in the test suite
     test('csrf token is not included in headers if url hostname is not the same as window.location (http)', () => {

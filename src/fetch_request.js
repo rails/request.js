@@ -67,7 +67,8 @@ export class FetchRequest {
       body: this.formattedBody,
       signal: this.signal,
       credentials: this.credentials,
-      redirect: this.redirect
+      redirect: this.redirect,
+      keepalive: this.keepalive
     }
   }
 
@@ -159,6 +160,10 @@ export class FetchRequest {
 
   get credentials () {
     return this.options.credentials || 'same-origin'
+  }
+
+  get keepalive () {
+    return this.options.keepalive || false
   }
 
   get additionalHeaders () {
