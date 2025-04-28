@@ -105,6 +105,10 @@ Specifies which response format will be accepted. Default is `html`.
 
 Options are `html`, `turbo-stream`, `json`, and `script`.
 
+##### keepalive
+
+Specifies the `keepalive` option. Default is `false`.
+
 #### Turbo Streams
 
 Request.JS will automatically process Turbo Stream responses. Ensure that your Javascript sets the `window.Turbo` global variable:
