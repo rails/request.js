@@ -19,10 +19,7 @@ export class FetchRequest {
       console.error(error)
     }
 
-    const fetch = (this.responseKind === 'turbo-stream' && window.Turbo)
-      ? window.Turbo.fetch
-      : window.fetch
-
+    const fetch = window.Turbo ? window.Turbo.fetch : window.fetch
     const response = new FetchResponse(await fetch(this.url, this.fetchOptions))
 
     if (response.unauthenticated && response.authenticationURL) {
