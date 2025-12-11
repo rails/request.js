@@ -312,7 +312,7 @@ describe('query params are parsed', () => {
 
 
 describe('turbostream', () => {
-  test('turbo fetch is called for turbo-stream responseKind', async() => {
+  test('turbo fetch is called when available', async() => {
     const mockResponse = new Response("success!", { status: 200 })
 
     window.fetch = jest.fn().mockResolvedValue(mockResponse)
@@ -326,13 +326,13 @@ describe('turbostream', () => {
     expect(testResponse).toStrictEqual(new FetchResponse(mockResponse))
   })
 
-  test('turbo fetch is called for other responseKind', async() => {
+  test('turbo fetch is not called when not available', async() => {
     const mockResponse = new Response("success!", { status: 200 })
 
     window.fetch = jest.fn().mockResolvedValue(mockResponse)
-    window.Turbo = { fetch: jest.fn().mockResolvedValue(mockResponse) }
+    window.Turbo = undefined
 
-    const testRequest = new FetchRequest("get", "localhost")
+    const testRequest = new FetchRequest("get", "localhost", { responseKind: 'turbo-stream' })
     const testResponse = await testRequest.perform()
 
     expect(window.Turbo.fetch).toHaveBeenCalledTimes(0)
