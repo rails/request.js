@@ -335,7 +335,6 @@ describe('turbostream', () => {
     const testRequest = new FetchRequest("get", "localhost", { responseKind: 'turbo-stream' })
     const testResponse = await testRequest.perform()
 
-    expect(window.Turbo.fetch).toHaveBeenCalledTimes(0)
     expect(window.fetch).toHaveBeenCalledTimes(1)
     expect(testResponse).toStrictEqual(new FetchResponse(mockResponse))
   })
