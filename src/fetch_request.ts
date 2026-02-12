@@ -2,14 +2,32 @@ import { FetchResponse } from './fetch_response'
 import { RequestInterceptor } from './request_interceptor'
 import { getCookie, compact, metaContent, stringEntriesFromFormData, mergeEntries } from './lib/utils'
 
+export type ResponseKind = 'html' | 'json' | 'turbo-stream' | 'script'
+
+export interface RequestOptions {
+  body?: BodyInit | Record<string, unknown> | null
+  contentType?: string
+  query?: Record<string, string> | FormData | URLSearchParams
+  responseKind?: ResponseKind | (string & {})
+  signal?: AbortSignal
+  headers?: Record<string, string>
+  credentials?: RequestCredentials
+  redirect?: RequestRedirect
+  keepalive?: boolean
+}
+
 export class FetchRequest {
-  constructor (method, url, options = {}) {
+  method: string
+  options: RequestOptions
+  originalUrl: string
+
+  constructor (method: string, url: string | URL, options: RequestOptions = {}) {
     this.method = method
     this.options = options
     this.originalUrl = url.toString()
   }
 
-  async perform () {
+  async perform (): Promise<FetchResponse> {
     try {
       const requestInterceptor = RequestInterceptor.get()
       if (requestInterceptor) {
@@ -19,8 +37,8 @@ export class FetchRequest {
       console.error(error)
     }
 
-    const fetch = window.Turbo ? window.Turbo.fetch : window.fetch
-    const response = new FetchResponse(await fetch(this.url, this.fetchOptions))
+    const fetchFunction = window.Turbo ? window.Turbo.fetch : window.fetch
+    const response = new FetchResponse(await fetchFunction(this.url, this.fetchOptions))
 
     if (response.unauthenticated && response.authenticationURL) {
       return Promise.reject(window.location.href = response.authenticationURL)
@@ -39,13 +57,13 @@ export class FetchRequest {
     return response
   }
 
-  addHeader (key, value) {
+  addHeader (key: string, value: string): void {
     const headers = this.additionalHeaders
     headers[key] = value
     this.options.headers = headers
   }
 
-  sameHostname () {
+  sameHostname (): boolean {
     if (!this.originalUrl.startsWith('http:') && !this.originalUrl.startsWith('https:')) {
       return true
     }
@@ -57,7 +75,7 @@ export class FetchRequest {
     }
   }
 
-  get fetchOptions () {
+  get fetchOptions (): RequestInit {
     return {
       method: this.method.toUpperCase(),
       headers: this.headers,
@@ -69,8 +87,8 @@ export class FetchRequest {
     }
   }
 
-  get headers () {
-    const baseHeaders = {
+  get headers (): Record<string, string> {
+    const baseHeaders: Record<string, string | undefined> = {
       'X-Requested-With': 'XMLHttpRequest',
       'Content-Type': this.contentType,
       Accept: this.accept
@@ -85,11 +103,11 @@ export class FetchRequest {
     )
   }
 
-  get csrfToken () {
-    return getCookie(metaContent('csrf-param')) || metaContent('csrf-token')
+  get csrfToken (): string | undefined {
+    return getCookie(metaContent('csrf-param') || '') || metaContent('csrf-token') || undefined
   }
 
-  get contentType () {
+  get contentType (): string | undefined {
     if (this.options.contentType) {
       return this.options.contentType
     } else if (this.body == null || this.body instanceof window.FormData) {
@@ -101,7 +119,7 @@ export class FetchRequest {
     return 'application/json'
   }
 
-  get accept () {
+  get accept (): string {
     switch (this.responseKind) {
       case 'html':
         return 'text/html, application/xhtml+xml'
@@ -116,21 +134,21 @@ export class FetchRequest {
     }
   }
 
-  get body () {
+  get body (): RequestOptions['body'] {
     return this.options.body
   }
 
-  get query () {
+  get query (): string {
     const originalQuery = (this.originalUrl.split('?')[1] || '').split('#')[0]
     const params = new URLSearchParams(originalQuery)
 
-    let requestQuery = this.options.query
-    if (requestQuery instanceof window.FormData) {
-      requestQuery = stringEntriesFromFormData(requestQuery)
-    } else if (requestQuery instanceof window.URLSearchParams) {
-      requestQuery = requestQuery.entries()
+    let requestQuery: Iterable<[string, string | File]>
+    if (this.options.query instanceof window.FormData) {
+      requestQuery = stringEntriesFromFormData(this.options.query)
+    } else if (this.options.query instanceof window.URLSearchParams) {
+      requestQuery = this.options.query.entries()
     } else {
-      requestQuery = Object.entries(requestQuery || {})
+      requestQuery = Object.entries(this.options.query || {})
     }
 
     mergeEntries(params, requestQuery)
@@ -139,35 +157,35 @@ export class FetchRequest {
     return (query.length > 0 ? `?${query}` : '')
   }
 
-  get url () {
+  get url (): string {
     return (this.originalUrl.split('?')[0]).split('#')[0] + this.query
   }
 
-  get responseKind () {
+  get responseKind (): string {
     return this.options.responseKind || 'html'
   }
 
-  get signal () {
+  get signal (): AbortSignal | undefined {
     return this.options.signal
   }
 
-  get redirect () {
+  get redirect (): RequestRedirect {
     return this.options.redirect || 'follow'
   }
 
-  get credentials () {
+  get credentials (): RequestCredentials {
     return this.options.credentials || 'same-origin'
   }
 
-  get keepalive () {
+  get keepalive (): boolean {
     return this.options.keepalive || false
   }
 
-  get additionalHeaders () {
+  get additionalHeaders (): Record<string, string> {
     return this.options.headers || {}
   }
 
-  get formattedBody () {
+  get formattedBody (): BodyInit | null | undefined {
     const bodyIsAString = Object.prototype.toString.call(this.body) === '[object String]'
     const contentTypeIsJson = this.headers['Content-Type'] === 'application/json'
 
@@ -175,6 +193,6 @@ export class FetchRequest {
       return JSON.stringify(this.body)
     }
 
-    return this.body
+    return this.body as BodyInit | null | undefined
   }
 }

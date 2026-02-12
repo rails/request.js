@@ -6,8 +6,8 @@ jobs:
   qa:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '22'
       - uses: actions/cache@v4
@@ -15,7 +15,9 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
       - run: yarn install
-      - name: Lint
-        run: yarn lint
+      - name: Typecheck
+        run: yarn typecheck
+      - name: Build
+        run: yarn build
       - name: Test
         run: yarn test

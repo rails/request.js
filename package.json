@@ -3,7 +3,8 @@
   "version": "0.0.12",
   "description": "A tiny Fetch API wrapper that allows you to make http requests without need to handle to send the CSRF Token on every request",
   "main": "./dist/requestjs.js",
-  "module": "./src/index.js",
+  "module": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "repository": "https://github.com/rails/request.js",
   "author": "Marcelo Lauxen <marcelolauxen16@gmail.com>",
   "license": "MIT",
@@ -18,21 +19,27 @@
     "url": "https://github.com/rails/request.js"
   },
   "scripts": {
-    "lint": "standard src",
     "build": "rollup -c",
+    "typecheck": "tsc --noEmit",
     "test": "jest"
+  },
+  "jest": {
+    "moduleFileExtensions": ["ts", "js"]
   },
   "devDependencies": {
     "@babel/core": "^7.26.10",
     "@babel/plugin-transform-modules-commonjs": "^7.26.3",
+    "@babel/preset-typescript": "^7.28.5",
     "@rollup/plugin-node-resolve": "^16.0.1",
     "@rollup/plugin-terser": "^0.4.4",
+    "@rollup/plugin-typescript": "^12.3.0",
     "babel-jest": "^29.7.0",
     "isomorphic-fetch": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
     "rollup": "^4.40.1",
-    "standard": "^17.1.2"
+    "tslib": "^2.8.1",
+    "typescript": "^5.9.3"
   },
   "dependencies": {}
 }

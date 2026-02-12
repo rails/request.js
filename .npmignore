@@ -1,3 +1,5 @@
-rollup.config.js
+rollup.config.mjs
 __tests__/
 .github/
+tsconfig.json
+.babelrc

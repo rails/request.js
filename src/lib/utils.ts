@@ -1,4 +1,4 @@
-export function getCookie (name) {
+export function getCookie (name: string): string | undefined {
   const cookies = document.cookie ? document.cookie.split('; ') : []
   const prefix = `${encodeURIComponent(name)}=`
   const cookie = cookies.find(cookie => cookie.startsWith(prefix))
@@ -12,8 +12,8 @@ export function getCookie (name) {
   }
 }
 
-export function compact (object) {
-  const result = {}
+export function compact (object: Record<string, string | undefined>): Record<string, string> {
+  const result: Record<string, string> = {}
 
   for (const key in object) {
     const value = object[key]
@@ -25,18 +25,18 @@ export function compact (object) {
   return result
 }
 
-export function metaContent (name) {
-  const element = document.head.querySelector(`meta[name="${name}"]`)
+export function metaContent (name: string): string | null {
+  const element = document.head.querySelector<HTMLMetaElement>(`meta[name="${name}"]`)
   return element && element.content
 }
 
-export function stringEntriesFromFormData (formData) {
-  return [...formData].reduce((entries, [name, value]) => {
+export function stringEntriesFromFormData (formData: FormData): [string, string][] {
+  return [...formData].reduce<[string, string][]>((entries, [name, value]) => {
     return entries.concat(typeof value === 'string' ? [[name, value]] : [])
   }, [])
 }
 
-export function mergeEntries (searchParams, entries) {
+export function mergeEntries (searchParams: URLSearchParams, entries: Iterable<[string, string | File]>): void {
   for (const [name, value] of entries) {
     if (value instanceof window.File) continue
 

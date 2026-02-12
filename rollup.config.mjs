@@ -1,16 +1,17 @@
 import resolve from "@rollup/plugin-node-resolve"
 import terser from "@rollup/plugin-terser"
-import pkg from "./package.json" assert { type: 'json' };
+import typescript from "@rollup/plugin-typescript"
 
 export default {
-  input: pkg.module,
+  input: "src/index.ts",
   output: {
-    file: pkg.main,
+    file: "dist/requestjs.js",
     format: "es",
     inlineDynamicImports: true
   },
   plugins: [
     resolve(),
+    typescript(),
     terser({
       mangle: false,
       compress: false,
