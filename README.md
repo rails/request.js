@@ -61,6 +61,20 @@ async myMethod () {
 }
 ```
 
+#### Fetch Priority
+
+You can use the [`priority`](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) option to hint the browser on the relative importance of a request
+
+```js
+import { get, post } from '@rails/request.js'
+
+// High priority fetch (e.g. critical data above the fold)
+const response = await get('/api/critical-data', { priority: 'high', responseKind: 'json' })
+
+// Low priority fetch (e.g. prefetch or analytics)
+await post('/api/analytics', { body: payload, priority: 'low' })
+```
+
 #### Request Options
 
 You can pass options to a request as the last argument. For example:
@@ -108,6 +122,10 @@ Options are `html`, `turbo-stream`, `json`, and `script`.
 ##### keepalive
 
 Specifies the `keepalive` option. Default is `false`.
+
+##### priority
+
+Specifies the [fetch priority](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) of the request relative to other requests of the same type. Must be one of `"high"`, `"low"`, or `"auto"` (default browser behavior when not specified).
 
 #### Turbo Streams
 
