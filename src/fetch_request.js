@@ -65,7 +65,8 @@ export class FetchRequest {
       signal: this.signal,
       credentials: this.credentials,
       redirect: this.redirect,
-      keepalive: this.keepalive
+      keepalive: this.keepalive,
+      priority: this.priority
     }
   }
 
@@ -153,6 +154,10 @@ export class FetchRequest {
 
   get redirect () {
     return this.options.redirect || 'follow'
+  }
+
+  get priority () {
+    return this.options.priority
   }
 
   get credentials () {

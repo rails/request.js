@@ -230,6 +230,21 @@ describe('header handling', () => {
     expect(request.fetchOptions.keepalive).toBe(true)
   })
 
+  test('sets priority', () => {
+    let request
+    request = new FetchRequest("get", "localhost")
+    expect(request.fetchOptions.priority).toBe(undefined)
+
+    request = new FetchRequest("get", "localhost", { priority: "high" })
+    expect(request.fetchOptions.priority).toBe("high")
+
+    request = new FetchRequest("get", "localhost", { priority: "low" })
+    expect(request.fetchOptions.priority).toBe("low")
+
+    request = new FetchRequest("get", "localhost", { priority: "auto" })
+    expect(request.fetchOptions.priority).toBe("auto")
+  })
+
   describe('csrf token inclusion', () => {
     // window.location.hostname is "localhost" in the test suite
     test('csrf token is not included in headers if url hostname is not the same as window.location (http)', () => {
